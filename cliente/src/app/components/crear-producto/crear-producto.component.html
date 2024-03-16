@@ -4,66 +4,60 @@
             <div class="card">
                 <div class="card-body text-center">
                     <span class="titulo"> {{ titulo | uppercase }}</span>
+                    <form class="mt-3" [formGroup]="mongoForm" (ngSubmit)="agregarProducto()">
+                        <div *ngIf="busca === '1'" class="mb-3">
+                            <input type="text" formControlName="_id" class="form-control form-control-lg" placeholder="ID Mongo">
+                        </div>
+                    </form>
                     <form class="mt-3" [formGroup]="productoForm" (ngSubmit)="agregarProducto()">
-                        
-                          <div class="mb-3">
-                            <input type="text" formControlName="color"
-                                class="form-control form-control-lg" placeholder="Color">
-                            
-                                <div class="text-danger"
-                            *ngIf="productoForm.get('color')?.hasError('required') && productoForm.get('color')?.touched">
+                        <div class="mb-3">
+                            <input type="text" formControlName="color" class="form-control form-control-lg" placeholder="Color">
+
+                            <div class="text-danger" *ngIf="productoForm.get('color')?.hasError('required') && productoForm.get('color')?.touched">
                                 <span>El color del produto <strong>es obligatorio</strong></span>
                             </div>
-                          </div>
-                          <div class="mb-3">
-                            <input type="text" formControlName="hoja"
-                                class="form-control form-control-lg" placeholder="Hoja">
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" formControlName="hoja" class="form-control form-control-lg" placeholder="Hoja">
 
-                            <div class="text-danger"
-                            *ngIf="productoForm.get('hoja')?.hasError('required') && productoForm.get('hoja')?.touched">
+                            <div class="text-danger" *ngIf="productoForm.get('hoja')?.hasError('required') && productoForm.get('hoja')?.touched">
                                 <span>El tipo de hoja del produto <strong>es obligatorio</strong></span>
                             </div>
-                          </div>
+                        </div>
 
-                          <div class="mb-3">
-                            <input type="text" formControlName="tapa"
-                                class="form-control form-control-lg" placeholder="Tapa">
+                        <div class="mb-3">
+                            <input type="text" formControlName="tapa" class="form-control form-control-lg" placeholder="Tapa">
 
-                            <div class="text-danger"
-                            *ngIf="productoForm.get('tapa')?.hasError('required') && productoForm.get('tapa')?.touched">
+                            <div class="text-danger" *ngIf="productoForm.get('tapa')?.hasError('required') && productoForm.get('tapa')?.touched">
                                 <span>El tipo de tapa del produto <strong>es obligatorio</strong></span>
                             </div>
-                          </div>
+                        </div>
 
-                          <div class="mb-3">
-                            <input type="number" formControlName="precio"
-                                class="form-control form-control-lg" placeholder="Precio">
+                        <div class="mb-3">
+                            <input type="number" formControlName="precio" class="form-control form-control-lg" placeholder="Precio">
 
-                            <div class="text-danger"
-                            *ngIf="productoForm.get('precio')?.hasError('required') && productoForm.get('precio')?.touched">
+                            <div class="text-danger" *ngIf="productoForm.get('precio')?.hasError('required') && productoForm.get('precio')?.touched">
                                 <span>El precio del produto <strong>es obligatorio</strong></span>
                             </div>
-                          </div>
+                        </div>
 
-                          <div class="mb-3">
-                            <input type="number" formControlName="stock"
-                                class="form-control form-control-lg" placeholder="Stock">
+                        <div class="mb-3">
+                            <input type="number" formControlName="stock" class="form-control form-control-lg" placeholder="Stock">
 
-                            <div class="text-danger"
-                            *ngIf="productoForm.get('stock')?.hasError('required') && productoForm.get('stock')?.touched">
+                            <div class="text-danger" *ngIf="productoForm.get('stock')?.hasError('required') && productoForm.get('stock')?.touched">
                                 <span>El stock del produto <strong>es obligatorio</strong></span>
                             </div>
-                          </div>
+                        </div>
 
-                            
 
-                            
-                          
-                          <div class="mt-3">
+
+
+
+                        <div class="mt-3">
                             <button routerLink="/admin" class="btn btn-secondary btn-lg float-start">VOLVER</button>
                             <button type="submit" [disabled]="productoForm.invalid" class="btn btn-success btn-lg float-end">ACEPTAR</button>
-                          </div>
-                    
+                        </div>
+
                     </form>
                 </div>
             </div>

@@ -12,6 +12,7 @@ import { ProductoDataService } from '../../services/listProductos.service'; // I
 })
 export class CrearProductoComponent implements OnInit {
     productoForm: FormGroup;
+    mongoForm: FormGroup;
     titulo = 'Crear producto';
     id: string | null;
     busca: string | null;
@@ -30,6 +31,9 @@ export class CrearProductoComponent implements OnInit {
             tapa: ['', Validators.required],
             precio: ['', Validators.required],
             stock: ['', Validators.required],
+        })
+        this.mongoForm = this.fb.group({
+            _id: ['', Validators.required],
         })
         this.id = this.aRouter.snapshot.paramMap.get('id');
         this.busca = this.aRouter.snapshot.paramMap.get('busca');
@@ -61,7 +65,7 @@ export class CrearProductoComponent implements OnInit {
                 .filter(([key, value]) => value !== undefined && value !== null) // Exclude undefined and null values
                 .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
                 .join('&');
-            this._productoService.buscarProductos(queryString).subscribe(data => {
+            this._productoService.buscarProductos("?" + queryString + "&productId=" + this.mongoForm.get('_id')?.value).subscribe(data => {
                 this.productoDataService.setListProductos(data);
                 this.router.navigate(['/admin']);
             }, error => {

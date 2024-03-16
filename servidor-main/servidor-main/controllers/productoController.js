@@ -12,8 +12,11 @@ exports.crearProducto = async(req, res) => {
     }
 };
 exports.obtenerProductos = async(req, res) => {
+    console.log("test");
     try {
+        console.log(req.query + " asd1");
         const { color, hoja, tapa, precio, stock, productId } = req.query;
+        console.log(productId + " asdddd");
 
         let query = {};
 
@@ -46,7 +49,6 @@ exports.obtenerProductos = async(req, res) => {
         if (productId) {
             query._id = productId;
         }
-
         const products = await Producto.find(query);
         res.json(products);
     } catch (err) {
