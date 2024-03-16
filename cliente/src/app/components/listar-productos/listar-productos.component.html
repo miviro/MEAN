@@ -1,0 +1,43 @@
+<div class="row">
+    <div class="col-lg-8 offset-lg-2">
+        <div class="card">
+            <div class="card-body text-center">
+                <span class="titulo">LISTADO DE LIBRETAS</span>
+                <button class="btn btn-success float-end" routerLink="/admin/crear-producto">NUEVO</button>
+                <i [routerLink]="['/admin/buscar-producto', '1']" class="fa fa-search text-primary float-end mt-2 me-2" aria-hidden="true"></i>
+
+                <table *ngIf="listProductos.length >  0" class="table table-striped mt-3">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Color</th>
+                            <th scope="col">Hoja</th>
+                            <th scope="col">Tapa</th>
+                            <th scope="col">Precio</th>
+                            <th scope="col">Stock</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let producto of listProductos">
+                            <td>{{ producto._id }}</td>
+                            <td>{{ producto.color }}</td>
+                            <td>{{ producto.hoja }}</td>
+                            <td>{{ producto.tapa }}</td>
+                            <td>{{ producto.precio}}€</td>
+                            <td>{{ producto.stock }}</td>
+                            <td>
+                                <i [routerLink]="['/admin/editar-producto', producto._id]" class="fa fa-pencil-square-o text-primary" aria-hidden="true"></i>
+                                <i (click)="eliminarProducto(producto._id)" class="fa fa-trash text-danger" aria-hidden="true"></i>
+
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+                <h5 style="text-align: start; margin-top: 10px;" *ngIf="listProductos.length == 0">No hay productos para mostrar
+                </h5>
+            </div>
+        </div>
+    </div>
+</div>
