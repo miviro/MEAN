@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ProductoService } from '../../services/producto.service';
 import { Producto } from '../../models/producto';
 import { ToastrService } from 'ngx-toastr';
-import { ProductoDataService } from '../../services/listProductos.service'; // Import the service
 @Component({
     selector: 'app-listar-productos',
     templateUrl: './listar-productos.component.html',

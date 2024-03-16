@@ -4,7 +4,6 @@ import { Producto } from '../../models/producto';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { ProductoService } from '../../services/producto.service';
-import { ProductoDataService } from '../../services/listProductos.service'; // Import the service
 @Component({
     selector: 'app-crear-producto',
     templateUrl: './crear-producto.component.html',
@@ -22,8 +21,7 @@ export class CrearProductoComponent implements OnInit {
         private router: Router,
         private toastr: ToastrService,
         private _productoService: ProductoService,
-        private aRouter: ActivatedRoute,
-        private productoDataService: ProductoDataService) {
+        private aRouter: ActivatedRoute) {
 
         this.productoForm = this.fb.group({
             color: ['', Validators.required],
@@ -66,7 +64,7 @@ export class CrearProductoComponent implements OnInit {
                 .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
                 .join('&');
             this._productoService.buscarProductos("?" + queryString + "&productId=" + this.mongoForm.get('_id')?.value).subscribe(data => {
-                this.productoDataService.setListProductos(data);
+                this.listProductos = data;
                 this.router.navigate(['/admin']);
             }, error => {
                 console.log(error);
