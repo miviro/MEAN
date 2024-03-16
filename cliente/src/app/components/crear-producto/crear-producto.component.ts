@@ -4,7 +4,7 @@ import { Producto } from '../../models/producto';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { ProductoService } from '../../services/producto.service';
-
+import { ProductoDataService } from '../../services/listProductos.service'; // Import the service
 @Component({
     selector: 'app-crear-producto',
     templateUrl: './crear-producto.component.html',
@@ -21,7 +21,8 @@ export class CrearProductoComponent implements OnInit {
         private router: Router,
         private toastr: ToastrService,
         private _productoService: ProductoService,
-        private aRouter: ActivatedRoute) {
+        private aRouter: ActivatedRoute,
+        private productoDataService: ProductoDataService) {
 
         this.productoForm = this.fb.group({
             color: ['', Validators.required],
@@ -32,6 +33,10 @@ export class CrearProductoComponent implements OnInit {
         })
         this.id = this.aRouter.snapshot.paramMap.get('id');
         this.busca = this.aRouter.snapshot.paramMap.get('busca');
+        if (this.busca === '1') {
+            this.titulo = 'Buscar productos';
+
+        }
     }
 
     ngOnInit(): void {
@@ -57,14 +62,13 @@ export class CrearProductoComponent implements OnInit {
                 .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
                 .join('&');
             this._productoService.buscarProductos(queryString).subscribe(data => {
-                listProductos = data;
+                this.productoDataService.setListProductos(data);
                 this.router.navigate(['/admin']);
             }, error => {
                 console.log(error);
                 this.toastr.error('Error en la búsqueda.', 'ERROR!');
                 this.router.navigate(['/admin']);
             });
-            this.toastr.info('fsdfsdfsdo', 'PRODUCsdfsdfADO!');
         } else {
             if (this.id !== null) {
                 //editamos producto
