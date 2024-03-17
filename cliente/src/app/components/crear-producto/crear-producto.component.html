@@ -11,10 +11,10 @@
                     </form>
                     <form class="mt-3" [formGroup]="productoForm" (ngSubmit)="agregarProducto()">
                         <div class="mb-3">
-                            <input type="text" formControlName="color" class="form-control form-control-lg" placeholder="Color">
+                            <input type="text" formControlName="color" class="form-control form-control-lg" placeholder="Color" [required]="busca !== '1'">
 
                             <div class="text-danger" *ngIf="productoForm.get('color')?.hasError('required') && productoForm.get('color')?.touched">
-                                <span>El color del produto <strong>es obligatorio</strong></span>
+                                <span>El color del producto <strong>es obligatorio</strong></span>
                             </div>
                         </div>
                         <div class="mb-3">

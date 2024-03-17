@@ -23,18 +23,29 @@ export class CrearProductoComponent implements OnInit {
         private _productoService: ProductoService,
         private aRouter: ActivatedRoute) {
 
-        this.productoForm = this.fb.group({
-            color: ['', Validators.required],
-            hoja: ['', Validators.required],
-            tapa: ['', Validators.required],
-            precio: ['', Validators.required],
-            stock: ['', Validators.required],
-        })
+        this.busca = this.aRouter.snapshot.paramMap.get('busca');
+        if (this.busca === '1') {
+            this.productoForm = this.fb.group({
+                color: [''],
+                hoja: [''],
+                tapa: [''],
+                precio: [''],
+                stock: [''],
+            })
+        } else {
+
+            this.productoForm = this.fb.group({
+                color: ['', Validators.required],
+                hoja: ['', Validators.required],
+                tapa: ['', Validators.required],
+                precio: ['', Validators.required],
+                stock: ['', Validators.required],
+            })
+        }
         this.mongoForm = this.fb.group({
             _id: ['', Validators.required],
         })
         this.id = this.aRouter.snapshot.paramMap.get('id');
-        this.busca = this.aRouter.snapshot.paramMap.get('busca');
         if (this.busca === '1') {
             this.titulo = 'Buscar productos';
 
@@ -55,12 +66,20 @@ export class CrearProductoComponent implements OnInit {
         }
 
         if (this.busca === '1') {
-            this.router.navigate(['/admin'], {
-                queryParams: {
-                    color: PRODUCTO.color, hoja: PRODUCTO.hoja,
-                    tapa: PRODUCTO.tapa, precio: PRODUCTO.precio, stock: PRODUCTO.stock, productId: this.mongoForm.get('_id')?.value
-                }
-            });
+            const queryParams: { [key: string]: string | number } = {
+                color: PRODUCTO.color,
+                hoja: PRODUCTO.hoja,
+                tapa: PRODUCTO.tapa,
+                precio: PRODUCTO.precio,
+                stock: PRODUCTO.stock,
+                productId: this.mongoForm.get('_id')?.value
+            };
+
+            // Filter out null or empty values from queryParams
+            Object.keys(queryParams).forEach(key => (queryParams[key] == null || queryParams[key] === '') && delete queryParams[key]);
+            this.toastr.success('La búsqueda fue realizada con exito', 'BUSQUEDA REALIZADA!');
+            this.router.navigate(['/admin'], { queryParams: queryParams as any });
+
         } else {
             if (this.id !== null) {
                 //editamos producto

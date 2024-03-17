@@ -29,14 +29,17 @@ export class ListarProductosComponent implements OnInit {
             } else {
                 console.log("2");
 
-                const paramsString = Object.keys(params).map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`).join('&');
+                const paramsString = Object.keys(params)
+                    .filter(key => params[key] !== null && params[key] !== undefined && params[key] !== '') // Filter out null, undefined, and empty values
+                    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+                    .join('&');
                 console.log(paramsString); // Log query parameters
                 this.obtenerProductos(paramsString);
             }
         });
     }
 
-    obtenerProductos(params: any = '') {
+    obtenerProductos(params: string = '') {
         // Check if there are any params in the URL
         if (params === '') {
             // If there are no params, execute getProductos
@@ -61,7 +64,7 @@ export class ListarProductosComponent implements OnInit {
 
     eliminarProducto(id: any) {
         this._productoService.eliminarProducto(id).subscribe(data => {
-            this.toastr.error('El producto fue eliminado con exito', 'PRODUCTO ELIMINADO!');
+            this.toastr.info('El producto fue eliminado con exito', 'PRODUCTO ELIMINADO!');
             this.obtenerProductos();
 
         }, error => {

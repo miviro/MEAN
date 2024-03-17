@@ -12,7 +12,6 @@ exports.crearProducto = async(req, res) => {
     }
 };
 exports.obtenerProductos = async(req, res) => {
-    console.log("test");
     try {
         const { color, hoja, tapa, precio, stock, productId } = req.query;
 
