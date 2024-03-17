@@ -7,6 +7,7 @@ import { CrearProductoComponent } from './components/crear-producto/crear-produc
 
 const routes: Routes = [
     { path: 'admin', component: ListarProductosComponent },
+    { path: 'admin', component: ListarProductosComponent, pathMatch: 'full' },
     { path: 'admin/crear-producto', component: CrearProductoComponent },
     { path: 'admin/editar-producto/:id', component: CrearProductoComponent },
     { path: 'admin/buscar-producto/:busca', component: CrearProductoComponent },

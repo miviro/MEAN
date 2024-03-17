@@ -46,10 +46,6 @@ export class CrearProductoComponent implements OnInit {
     }
 
     agregarProducto() {
-        //console.log(this.productoForm);
-
-        //console.log(this.productoForm.get('producto')?.value);
-
         const PRODUCTO: Producto = {
             color: this.productoForm.get('color')?.value,
             hoja: this.productoForm.get('hoja')?.value,
@@ -59,17 +55,11 @@ export class CrearProductoComponent implements OnInit {
         }
 
         if (this.busca === '1') {
-            const queryString = Object.entries(PRODUCTO)
-                .filter(([key, value]) => value !== undefined && value !== null) // Exclude undefined and null values
-                .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-                .join('&');
-            this._productoService.buscarProductos("?" + queryString + "&productId=" + this.mongoForm.get('_id')?.value).subscribe(data => {
-                this.listProductos = data;
-                this.router.navigate(['/admin']);
-            }, error => {
-                console.log(error);
-                this.toastr.error('Error en la búsqueda.', 'ERROR!');
-                this.router.navigate(['/admin']);
+            this.router.navigate(['/admin'], {
+                queryParams: {
+                    color: PRODUCTO.color, hoja: PRODUCTO.hoja,
+                    tapa: PRODUCTO.tapa, precio: PRODUCTO.precio, stock: PRODUCTO.stock, productId: this.mongoForm.get('_id')?.value
+                }
             });
         } else {
             if (this.id !== null) {
@@ -98,9 +88,6 @@ export class CrearProductoComponent implements OnInit {
                 })
             }
         }
-
-
-
     }
 
     esEditar() {

@@ -17,7 +17,7 @@ export class ProductoService {
 
     buscarProductos(producto: string): Observable<any> {
 
-        return this.http.get(this.url + producto);
+        return this.http.get(this.url + "?" + producto);
     }
 
     eliminarProducto(id: string): Observable<any> {
