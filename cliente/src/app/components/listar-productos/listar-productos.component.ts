@@ -106,7 +106,7 @@ export class ListarProductosComponent implements OnInit {
             console.log(error);
         });
     }
-    agregarProducto() {
+    agregarProducto(busca: boolean, id: string) {
         const PRODUCTO: Producto = {
             color: this.productoForm.get('color')?.value,
             hoja: this.productoForm.get('hoja')?.value,
@@ -115,7 +115,7 @@ export class ListarProductosComponent implements OnInit {
             stock: this.productoForm.get('stock')?.value,
         }
 
-        if (this.busca === '1') {
+        if (busca) {
             const queryParams: { [key: string]: string | number } = {
                 color: PRODUCTO.color,
                 hoja: PRODUCTO.hoja,
@@ -131,11 +131,12 @@ export class ListarProductosComponent implements OnInit {
             this.router.navigate(['/admin'], { queryParams: queryParams as any });
 
         } else {
-            if (this.id !== null) {
+            if (id !== '') {
                 //editamos producto
-                this._productoService.editarProducto(this.id, PRODUCTO).subscribe(data => {
+                this._productoService.editarProducto(id, PRODUCTO).subscribe(data => {
+                    // TODO: modificar los valores de la form para que se actualicen en la vista
+
                     this.toastr.info('El producto fue actualizado con exito', 'PRODUCTO ACTUALIZADO!');
-                    this.router.navigate(['/admin']);
 
                 }, error => {
                     console.log(error);
