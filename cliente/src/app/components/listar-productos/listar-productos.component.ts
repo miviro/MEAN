@@ -4,6 +4,7 @@ import { Producto } from '../../models/producto';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Router } from '@angular/router'; // Import ActivatedRoute
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { switchScan } from 'rxjs';
 
 @Component({
     selector: 'app-listar-productos',
@@ -51,13 +52,10 @@ export class ListarProductosComponent implements OnInit {
         this.id = this.route.snapshot.paramMap.get('id');
         if (this.busca === '1') {
             this.titulo = 'Buscar productos';
-
         }
     }
     ngOnInit(): void {
         this.route.queryParams.subscribe(params => {
-            this.esEditar();
-
             if (Object.keys(params).length === 0 && params.constructor === Object) {
                 console.log("1");
                 this.obtenerProductos();
@@ -106,46 +104,45 @@ export class ListarProductosComponent implements OnInit {
             console.log(error);
         });
     }
-    agregarProducto(busca: boolean, id: string) {
-        const PRODUCTO: Producto = {
+    agregarProducto(id: string) {
+        let PRODUCTO: Producto = {
             color: this.productoForm.get('color')?.value,
             hoja: this.productoForm.get('hoja')?.value,
             tapa: this.productoForm.get('tapa')?.value,
             precio: this.productoForm.get('precio')?.value,
             stock: this.productoForm.get('stock')?.value,
         }
+        switch (this.titulo) {
+            case 'Buscar productos':
+                const queryParams: { [key: string]: string | number } = {
+                    color: PRODUCTO.color,
+                    hoja: PRODUCTO.hoja,
+                    tapa: PRODUCTO.tapa,
+                    precio: PRODUCTO.precio,
+                    stock: PRODUCTO.stock,
+                    productId: this.mongoForm.get('_id')?.value
+                };
 
-        if (busca) {
-            const queryParams: { [key: string]: string | number } = {
-                color: PRODUCTO.color,
-                hoja: PRODUCTO.hoja,
-                tapa: PRODUCTO.tapa,
-                precio: PRODUCTO.precio,
-                stock: PRODUCTO.stock,
-                productId: this.mongoForm.get('_id')?.value
-            };
-
-            // Filter out null or empty values from queryParams
-            Object.keys(queryParams).forEach(key => (queryParams[key] == null || queryParams[key] === '') && delete queryParams[key]);
-            this.toastr.success('La búsqueda fue realizada con exito', 'BUSQUEDA REALIZADA!');
-            this.router.navigate(['/admin'], { queryParams: queryParams as any });
-
-        } else {
-            if (id !== '') {
+                // Filter out null or empty values from queryParams
+                Object.keys(queryParams).forEach(key => (queryParams[key] == null || queryParams[key] === '') && delete queryParams[key]);
+                this.toastr.success('La búsqueda fue realizada con exito', 'BUSQUEDA REALIZADA!');
+                this.router.navigate(['/admin'], { queryParams: queryParams as any });
+                this.titulo = 'Buscar productos';
+                break;
+            case 'Editar producto':
                 //editamos producto
-                this._productoService.editarProducto(id, PRODUCTO).subscribe(data => {
-                    // TODO: modificar los valores de la form para que se actualicen en la vista
-
-                    this.toastr.info('El producto fue actualizado con exito', 'PRODUCTO ACTUALIZADO!');
-
-                }, error => {
-                    console.log(error);
-                    this.toastr.error('El producto NO fue registrado con exito', 'ERROR!');
-
-                    this.productoForm.reset();
-                })
-            } else {
-                //agregamos producto
+                this._productoService.obtenerProducto(id).subscribe(data => {
+                    this.productoForm.setValue({
+                        color: data.color,
+                        hoja: data.hoja,
+                        tapa: data.tapa,
+                        precio: data.precio,
+                        stock: data.stock,
+                    })
+                });
+                this.titulo = 'Editar producto';
+                break;
+            case 'Crear producto':
                 this._productoService.guardarProducto(PRODUCTO).subscribe(data => {
                     this.toastr.success('El producto fue registrado con exito', 'PRODUCTO REGISTRADO!');
                     this.router.navigate(['/admin']);
@@ -156,22 +153,16 @@ export class ListarProductosComponent implements OnInit {
 
                     this.productoForm.reset();
                 })
-            }
+                break
+            default:
+                this.toastr.error('Error cliente', 'ERROR!');
+                break;
         }
     }
 
-    esEditar() {
-        if (this.id !== null) {
-            this.titulo = 'Editar producto';
-            this._productoService.obtenerProducto(this.id).subscribe(data => {
-                this.productoForm.setValue({
-                    color: data.color,
-                    hoja: data.hoja,
-                    tapa: data.tapa,
-                    precio: data.precio,
-                    stock: data.stock,
-                })
-            })
-        }
+    cambiarABusqueda() {
+        this.titulo = 'Buscar productos';
+        this.busca = '1';
+        this.productoForm.reset();
     }
 }
