@@ -60,7 +60,7 @@
                             </div>
                         </div>
 
-                        <button class="btn btn-success float-end" routerLink="/admin/">ENVIAR</button>
+                        <button class="btn btn-success float-end" [routerLink]="['/admin/']">ENVIAR</button>
                     </form>
                 </div>
             </div>
@@ -73,7 +73,7 @@
                     <span class="titulo">LISTADO DE LIBRETAS</span>
                     <i (click)="cambiarABusqueda();" class="fa fa-search text-primary float-end mt-2 me-2"
                         aria-hidden="true"></i>
-                    <i [routerLink]="['/admin']" (click)="this.titulo = 'Crear producto'"
+                    <i [routerLink]="['/admin']" (click)="cambiarACrear()"
                         class="fa fa-refresh text-primary float-end mt-2 me-2" aria-hidden="true"></i>
 
                     <table *ngIf="listProductos.length >  0" class="table table-striped mt-3">
@@ -97,7 +97,7 @@
                                 <td>{{ producto.precio}}</td>
                                 <td>{{ producto.stock }}</td>
                                 <td>
-                                    <i (click)="agregarProducto(producto._id || '')"
+                                    <i (click)="cambiarAEditar(producto._id || '')"
                                         class="fa fa-pencil-square-o text-primary" aria-hidden="true"></i>
                                     <i (click)="eliminarProducto(producto._id)" class="fa fa-trash text-danger"
                                         aria-hidden="true"></i>

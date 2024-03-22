@@ -127,31 +127,32 @@ export class ListarProductosComponent implements OnInit {
                 Object.keys(queryParams).forEach(key => (queryParams[key] == null || queryParams[key] === '') && delete queryParams[key]);
                 this.toastr.success('La búsqueda fue realizada con exito', 'BUSQUEDA REALIZADA!');
                 this.router.navigate(['/admin'], { queryParams: queryParams as any });
-                this.titulo = 'Buscar productos';
                 break;
             case 'Editar producto':
                 //editamos producto
-                this._productoService.obtenerProducto(id).subscribe(data => {
-                    this.productoForm.setValue({
-                        color: data.color,
-                        hoja: data.hoja,
-                        tapa: data.tapa,
-                        precio: data.precio,
-                        stock: data.stock,
-                    })
+
+                this._productoService.editarProducto(this.mongoForm.get("_id")?.value, PRODUCTO).subscribe(data => {
+                    this.toastr.success('El producto fue editado con exito', 'OK!');
+                    this.obtenerProductos('');
+                    this.router.navigate(['/admin'], {});
+                    this.cambiarACrear();
+                }, error => {
+                    console.log(error);
+                    this.toastr.error('El producto NO fue editado con exito', 'ERROR!');
                 });
-                this.titulo = 'Editar producto';
                 break;
             case 'Crear producto':
                 this._productoService.guardarProducto(PRODUCTO).subscribe(data => {
                     this.toastr.success('El producto fue registrado con exito', 'PRODUCTO REGISTRADO!');
-                    this.router.navigate(['/admin']);
-
+                    this.obtenerProductos('');
+                    this.router.navigate(['/admin'], {});
+                    this.cambiarACrear();
                 }, error => {
                     console.log(error);
                     this.toastr.error('El producto NO fue registrado con exito', 'ERROR!');
 
                     this.productoForm.reset();
+                    this.mongoForm.reset();
                 })
                 break
             default:
@@ -160,9 +161,35 @@ export class ListarProductosComponent implements OnInit {
         }
     }
 
+    cambiarACrear() {
+        this.titulo = 'Crear producto';
+        this.busca = '0';
+        this.productoForm.reset();
+        this.mongoForm.reset();
+        this.router.navigate(['/admin'], {});
+    }
+
     cambiarABusqueda() {
         this.titulo = 'Buscar productos';
         this.busca = '1';
         this.productoForm.reset();
+        this.mongoForm.reset();
+    }
+    cambiarAEditar(id: string) {
+        console.log(id);
+        this.titulo = 'Editar producto';
+        this.busca = '0';
+        this.productoForm.reset();
+        this.mongoForm.reset();
+        this.mongoForm.setValue({ _id: id });
+        this._productoService.obtenerProducto(id).subscribe(data => {
+            this.productoForm.setValue({
+                color: data.color,
+                hoja: data.hoja,
+                tapa: data.tapa,
+                precio: data.precio,
+                stock: data.stock,
+            })
+        });
     }
 }
