@@ -13,54 +13,36 @@
                     <form class="mt-3" [formGroup]="productoForm" (ngSubmit)="agregarProducto('')">
                         <div class="mb-3">
                             <input type="text" formControlName="color" class="form-control form-control-lg"
-                                placeholder="Color" [required]="busca !== '1'">
+                                placeholder="Color">
 
-                            <div class="text-danger"
-                                *ngIf="productoForm.get('color')?.hasError('required') && productoForm.get('color')?.touched">
-                                <span>El color del producto <strong>es obligatorio</strong></span>
-                            </div>
                         </div>
                         <div class="mb-3">
                             <input type="text" formControlName="hoja" class="form-control form-control-lg"
                                 placeholder="Hoja">
 
-                            <div class="text-danger"
-                                *ngIf="productoForm.get('hoja')?.hasError('required') && productoForm.get('hoja')?.touched">
-                                <span>El tipo de hoja del produto <strong>es obligatorio</strong></span>
-                            </div>
+
                         </div>
 
                         <div class="mb-3">
                             <input type="text" formControlName="tapa" class="form-control form-control-lg"
                                 placeholder="Tapa">
 
-                            <div class="text-danger"
-                                *ngIf="productoForm.get('tapa')?.hasError('required') && productoForm.get('tapa')?.touched">
-                                <span>El tipo de tapa del produto <strong>es obligatorio</strong></span>
-                            </div>
+
                         </div>
 
                         <div class="mb-3">
                             <input type="number" formControlName="precio" class="form-control form-control-lg"
                                 placeholder="Precio">
 
-                            <div class="text-danger"
-                                *ngIf="productoForm.get('precio')?.hasError('required') && productoForm.get('precio')?.touched">
-                                <span>El precio del produto <strong>es obligatorio</strong></span>
-                            </div>
                         </div>
 
                         <div class="mb-3">
                             <input type="number" formControlName="stock" class="form-control form-control-lg"
                                 placeholder="Stock">
 
-                            <div class="text-danger"
-                                *ngIf="productoForm.get('stock')?.hasError('required') && productoForm.get('stock')?.touched">
-                                <span>El stock del produto <strong>es obligatorio</strong></span>
-                            </div>
                         </div>
 
-                        <button class="btn btn-success float-end" [routerLink]="['/admin/']">ENVIAR</button>
+                        <button class="btn btn-success float-end" type="submit">ENVIAR</button>
                     </form>
                 </div>
             </div>

@@ -130,16 +130,19 @@ export class ListarProductosComponent implements OnInit {
                 break;
             case 'Editar producto':
                 //editamos producto
-
-                this._productoService.editarProducto(this.mongoForm.get("_id")?.value, PRODUCTO).subscribe(data => {
-                    this.toastr.success('El producto fue editado con exito', 'OK!');
-                    this.obtenerProductos('');
-                    this.router.navigate(['/admin'], {});
-                    this.cambiarACrear();
-                }, error => {
-                    console.log(error);
+                if (Object.values(PRODUCTO).some(value => value === null || value === '')) {
                     this.toastr.error('El producto NO fue editado con exito', 'ERROR!');
-                });
+                } else {
+                    this._productoService.editarProducto(this.mongoForm.get("_id")?.value, PRODUCTO).subscribe(data => {
+                        this.toastr.success('El producto fue editado con exito', 'OK!');
+                        this.obtenerProductos('');
+                        this.router.navigate(['/admin'], {});
+                        this.cambiarACrear();
+                    }, error => {
+                        console.log(error);
+                        this.toastr.error('El producto NO fue editado con exito', 'ERROR!');
+                    });
+                }
                 break;
             case 'Crear producto':
                 this._productoService.guardarProducto(PRODUCTO).subscribe(data => {
