@@ -1,17 +1,17 @@
-const Producto = require('../models/Producto');
+const Usuario = require('../models/Usuario');
 
-exports.crearProducto = async(req, res) => {
+exports.crearUsuario = async(req, res) => {
     try {
-        let producto;
-        producto = new Producto(req.body);
-        await producto.save();
-        res.send(producto);
+        let usuario;
+        usuario = new Usuario(req.body);
+        await usuario.save();
+        res.send(usuario);
     } catch (error) {
         console.log(error);
         res.status(500).send('Hubo un error');
     }
 };
-exports.obtenerProductos = async(req, res) => {
+exports.obtenerUsuarios = async(req, res) => {
     try {
         const { color, hoja, tapa, precio, stock, productId } = req.query;
 
@@ -46,60 +46,60 @@ exports.obtenerProductos = async(req, res) => {
         if (productId) {
             query._id = productId;
         }
-        const products = await Producto.find(query);
+        const products = await Usuario.find(query);
         res.json(products);
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 };
-exports.obtenerProducto = async(req, res) => {
+exports.obtenerUsuario = async(req, res) => {
     try {
-        let producto = await Producto.findById(req.params.id);
+        let usuario = await Usuario.findById(req.params.id);
 
-        if (!producto) {
-            res.status(404).json({ msg: 'No existe el producto' });
+        if (!usuario) {
+            res.status(404).json({ msg: 'No existe el usuario' });
         }
-        res.json(producto);
+        res.json(usuario);
     } catch (error) {
         console.log(error);
         res.status(500).send('Hubo un error');
     }
 };
 
-exports.eliminarProducto = async(req, res) => {
+exports.eliminarUsuario = async(req, res) => {
     try {
-        let producto = await Producto.findById(req.params.id);
-        if (!producto) {
-            res.status(404).json({ msg: 'No existe el producto' });
+        let usuario = await Usuario.findById(req.params.id);
+        if (!usuario) {
+            res.status(404).json({ msg: 'No existe el usuario' });
         }
-        await Producto.deleteOne({ _id: req.params.id });
-        res.json({ msg: 'Producto eliminado' });
+        await Usuario.deleteOne({ _id: req.params.id });
+        res.json({ msg: 'Usuario eliminado' });
     } catch (error) {
         console.log(error);
         res.status(500).send('Hubo un error');
     }
 };
-exports.actualizarProducto = async(req, res) => {
+exports.actualizarUsuario = async(req, res) => {
     try {
         const { color, hoja, tapa, precio, stock } = req.body;
-        let producto = await Producto.findById(req.params.id);
+        let usuario = await Usuario.findById(req.params.id);
 
-        if (!producto) {
-            res.status(404).json({ msg: 'No existe el producto' });
+        if (!usuario) {
+            res.status(404).json({ msg: 'No existe el usuario' });
         }
 
-        producto.color = color;
-        producto.hoja = hoja;
-        producto.tapa = tapa;
-        producto.precio = precio;
-        producto.stock = stock;
+        usuario.color = color;
+        usuario.hoja = hoja;
+        usuario.tapa = tapa;
+        usuario.precio = precio;
+        usuario.stock = stock;
 
-        producto = await Producto.findOneAndUpdate({
+        usuario = await Usuario.findOneAndUpdate({
             _id: req.params.id
-        }, producto, { new: true });
+        }, usuario, { new: true });
 
-        res.json(producto);
+        res.json(usuario);
     } catch (error) {
         console.log(error);
         res.status(500).send('Hubo un error');
