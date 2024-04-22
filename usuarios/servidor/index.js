@@ -1,11 +1,10 @@
 const express = require('express');
-const { conectarDB, poblarDB } = require('./config/db');
+const { conectarDB } = require('./config/db');
 const cors = require("cors");
 
 const app = express();
 
 conectarDB();
-poblarDB();
 app.use(cors());
 
 

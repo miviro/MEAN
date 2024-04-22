@@ -2,10 +2,10 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 //componentes
-import { ListarProductosComponent } from './components/listar-productos/listar-productos.component';
+import { ListarUsuariosComponent } from './components/usuarios/usuarios';
 
 const routes: Routes = [
-    { path: 'admin', component: ListarProductosComponent, pathMatch: 'full' },
+    { path: 'admin', component: ListarUsuariosComponent, pathMatch: 'full' },
     { path: '**', redirectTo: 'admin', pathMatch: 'full' }
 ];
 
