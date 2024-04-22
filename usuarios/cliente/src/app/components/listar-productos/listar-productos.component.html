@@ -4,45 +4,12 @@
             <div class="card">
                 <div class="card-body text-center">
                     <span class="titulo"> {{ titulo | uppercase }}</span>
-                    <form class="mt-3" [formGroup]="mongoForm" (ngSubmit)="agregarProducto('')">
-                        <div *ngIf="busca === '1'" class="mb-3">
-                            <input type="text" formControlName="_id" class="form-control form-control-lg"
-                                placeholder="ID Mongo">
-                        </div>
-                    </form>
-                    <form class="mt-3" [formGroup]="productoForm" (ngSubmit)="agregarProducto('')">
+                    <form class="mt-3" [formGroup]="productoForm" (ngSubmit)="iniciarSesion()">
                         <div class="mb-3">
-                            <input type="text" formControlName="color" class="form-control form-control-lg"
-                                placeholder="Color">
-
+                            <input type="text" formControlName="id" class="form-control form-control-lg" placeholder="Introduzca su ID">
                         </div>
-                        <div class="mb-3">
-                            <input type="text" formControlName="hoja" class="form-control form-control-lg"
-                                placeholder="Hoja">
-
-
-                        </div>
-
-                        <div class="mb-3">
-                            <input type="text" formControlName="tapa" class="form-control form-control-lg"
-                                placeholder="Tapa">
-
-
-                        </div>
-
-                        <div class="mb-3">
-                            <input type="number" formControlName="precio" class="form-control form-control-lg"
-                                placeholder="Precio">
-
-                        </div>
-
-                        <div class="mb-3">
-                            <input type="number" formControlName="stock" class="form-control form-control-lg"
-                                placeholder="Stock">
-
-                        </div>
-
-                        <button class="btn btn-success float-end" type="submit">ENVIAR</button>
+                        <button class="btn btn-success float-end" type="submit">Iniciar sesión</button>
+                        <button type="button" class="btn btn-danger float-end hidden" *ngIf="loggedRole != -1" (click)="cerrarSesion()">Cerrar sesión</button>
                     </form>
                 </div>
             </div>
@@ -51,46 +18,50 @@
     <div class="row">
         <div class="col-lg-8 offset-lg-2">
             <div class="card">
-                <div class="card-body text-center">
-                    <span class="titulo">LISTADO DE LIBRETAS</span>
-                    <i (click)="cambiarABusqueda();" class="fa fa-search text-primary float-end mt-2 me-2"
-                        aria-hidden="true"></i>
-                    <i [routerLink]="['/admin']" (click)="cambiarACrear()"
-                        class="fa fa-refresh text-primary float-end mt-2 me-2" aria-hidden="true"></i>
+                <!-- CREACIÓN DE USUARIOS ------------------------------------------------------------->
+                <div *ngIf="loggedRole == -1" class="card-body text-center">
+                    <span class="titulo">Acciones disponibles:</span>
+                    <form class="mt-3" [formGroup]="productoForm" (ngSubmit)="crearUsuario()">
+                        <div class="mb-3 form-control form-control-lg">
+                            <h2>Registrarse como:</h2>
 
-                    <table *ngIf="listProductos.length >  0" class="table table-striped mt-3">
-                        <thead>
-                            <tr>
-                                <th scope="col">ID</th>
-                                <th scope="col">Color</th>
-                                <th scope="col">Hoja</th>
-                                <th scope="col">Tapa</th>
-                                <th scope="col">Precio</th>
-                                <th scope="col">Stock</th>
-                                <th scope="col"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let producto of listProductos">
-                                <td>{{ producto._id }}</td>
-                                <td>{{ producto.color }}</td>
-                                <td>{{ producto.hoja }}</td>
-                                <td>{{ producto.tapa }}</td>
-                                <td>{{ producto.precio}}</td>
-                                <td>{{ producto.stock }}</td>
-                                <td>
-                                    <i (click)="cambiarAEditar(producto._id || '')"
-                                        class="fa fa-pencil-square-o text-primary" aria-hidden="true"></i>
-                                    <i (click)="eliminarProducto(producto._id)" class="fa fa-trash text-danger"
-                                        aria-hidden="true"></i>
+                            <div>
+                                <input class="example-radio-button" type="radio" id="cliente" name="options" value="cliente">
+                                <label for="cliente"> Cliente</label>
+                            </div>
+                            <div>
+                                <input class="example-radio-button" type="radio" id="admin" name="options" value="admin">
+                                <label for="admin"> Admin</label>
+                            </div>
 
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <h5 style="text-align: start; margin-top: 10px;" *ngIf="listProductos.length == 0">No hay productos
-                        para mostrar
-                    </h5>
+                        </div>
+                        <button class="btn btn-info float-end" type="submit">Darse de alta</button>
+                    </form>
+                </div>
+            </div>
+            <div class="card">
+                <!-- PARA USUARIOS/ADMINS ------------------------------------------------------------->
+                <div *ngIf="loggedRole == 0 || loggedRole == 1" class="card-body text-center">
+                    <span class="titulo">Acciones disponibles:</span>
+                    <form class="mt-3" [formGroup]="productoForm" (ngSubmit)="borrarUsuario()">
+                        <button class="btn btn-danger float-end" type="submit">Darse de baja</button>
+                    </form>
+                </div>
+            </div>
+            <div class="card">
+                <!-- PARA ADMINS ------------------------------------------------------------->
+                <div *ngIf="loggedRole == 1" class="card-body text-center">
+                    <span class="titulo">Acciones disponibles:</span>
+                    <h2>Consulta de usuarios:</h2>
+                    <form class="mt-3" [formGroup]="consultaForm" (ngSubmit)="consultaUsuarios()">
+                        <div class="mb-3">
+                            <input type="text" formControlName="id" class="form-control form-control-lg" placeholder="Introduzca el ID">
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" formControlName="rol" class="form-control form-control-lg" placeholder="Introduzca el rol">
+                        </div>
+                        <button class="btn btn-success float-end" type="submit">Buscar</button>
+                    </form>
                 </div>
             </div>
         </div>

@@ -13,12 +13,14 @@ import { switchScan } from 'rxjs';
 })
 export class ListarProductosComponent implements OnInit {
     productoForm: FormGroup;
+    consultaForm: FormGroup;
     mongoForm: FormGroup;
-    titulo = 'Crear producto';
+    titulo = 'Inicie sesión';
     id: string | null;
     busca: string | null;
     listProductos: Producto[] = [];
     query: string | null;
+    loggedRole = -1;
 
     constructor(
         private _productoService: ProductoService,
@@ -31,20 +33,21 @@ export class ListarProductosComponent implements OnInit {
         this.busca = this.route.snapshot.paramMap.get('busca');
         if (this.busca === '1') {
             this.productoForm = this.fb.group({
-                color: [''],
-                hoja: [''],
-                tapa: [''],
-                precio: [''],
-                stock: [''],
+                id: ['', Validators.required],
+            })
+            this.consultaForm = this.fb.group({
+                id: ['', Validators.required],
+                rol: ['', Validators.required],
             })
         } else {
             this.productoForm = this.fb.group({
-                color: ['', Validators.required],
-                hoja: ['', Validators.required],
-                tapa: ['', Validators.required],
-                precio: ['', Validators.required],
-                stock: ['', Validators.required],
-            })
+                id: ['', Validators.required],
+
+            });
+            this.consultaForm = this.fb.group({
+                id: ['', Validators.required],
+                rol: ['', Validators.required],
+            });
         }
         this.mongoForm = this.fb.group({
             _id: ['', Validators.required],
@@ -93,6 +96,30 @@ export class ListarProductosComponent implements OnInit {
                 console.log(error);
             });
         }
+    }
+
+    iniciarSesion() {
+        let valor = this.productoForm.get("id")?.value;
+        console.log(valor);
+        this.toastr.info('Iniciaste sesión', valor);
+        this.loggedRole = Number(this.productoForm.get("id")?.value); // TODO: 0 para usuario, 1 para admin
+
+    }
+    cerrarSesion() {
+        this.toastr.info('Cerraste sesión', 'Adios!');
+        this.loggedRole = -1;
+    }
+
+    crearUsuario() {
+        this.toastr.success('Usuario creado con exito', 'Usuario creado!');
+    }
+
+    borrarUsuario() {
+        this.toastr.error('Usuario eliminado con exito', 'Usuario eliminado!');
+    }
+
+    consultaUsuarios() {
+        this.toastr.info('Consulta realizada con exito', 'Consulta realizada!');
     }
 
     eliminarProducto(id: any) {
