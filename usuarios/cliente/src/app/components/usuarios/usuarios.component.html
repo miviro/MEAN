@@ -1,33 +1,28 @@
 <div class="container mt-mt5">
     <div class="row">
         <div class="col-lg-8 offset-lg-2">
-            <div class="card">
+            <div class="card" *ngIf="pidiendoID">
                 <div class="card-body text-center">
                     <span class="titulo"> {{ titulo | uppercase }}</span>
-                    <form class="mt-3" [formGroup]="sesionForm" (ngSubmit)="iniciarSesion()">
+                    <form class="mt-3" [formGroup]="sesionForm" (ngSubmit)="defaultClickHandler()">
                         <div class="mb-3">
                             <input type="text" formControlName="id" class="form-control form-control-lg"
                                 placeholder="Introduzca su ID">
-                        </div>
-                        <button class="btn btn-success float-end" type="submit">Iniciar sesión</button>
-                        <div *ngIf="loggedRole != 'sinrol'">
-                            <span class="titulo">ID: {{ idUsuario }} Rol: {{ loggedRole }}</span>
-                            <button type="button" class="btn btn-danger float-end hidden"
-                                (click)="cerrarSesion()">Cerrar sesión</button>
+                            <button class="btn btn-success float-end" type="submit">Continuar</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row">
+    <div *ngIf="!pidiendoID" class="row">
         <div class="col-lg-8 offset-lg-2">
             <div class="card">
                 <span class="titulo form-control-lg">Acciones disponibles:</span>
             </div>
             <div class="card">
                 <!-- CREACIÓN DE USUARIOS ------------------------------------------------------------->
-                <div *ngIf="loggedRole == 'sinrol'" class="card-body text-center">
+                <div class="card-body text-center">
                     <form class="mt-3" [formGroup]="crearForm" (ngSubmit)="crearUsuario()">
                         <div class="mb-3 form-control-lg">
                             <h2>Registrarse como:</h2>
@@ -50,13 +45,13 @@
             </div>
             <div class="card">
                 <!-- PARA USUARIOS/ADMINS ------------------------------------------------------------->
-                <div *ngIf="loggedRole == 'admin' || loggedRole == 'cliente'" class="card-body text-center">
+                <div class="card-body text-center">
                     <button class="btn btn-danger float-end" (click)="borrarUsuario()">Darse de baja</button>
                 </div>
             </div>
             <div class="card">
                 <!-- PARA ADMINS ------------------------------------------------------------->
-                <div *ngIf="loggedRole == 'admin'" class="card-body text-center">
+                <div class="card-body text-center">
                     <h2>Consulta de usuarios:</h2>
                     <form class="mt-3" [formGroup]="consultaForm" (ngSubmit)="consultaUsuarios()">
                         <div class="mb-3">

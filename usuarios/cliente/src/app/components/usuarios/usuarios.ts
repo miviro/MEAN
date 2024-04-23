@@ -14,10 +14,11 @@ export class ListarUsuariosComponent implements OnInit {
     sesionForm: FormGroup;
     consultaForm: FormGroup;
     crearForm: FormGroup;
-    titulo = 'Inicie sesión';
+    titulo = 'Introduzca su ID';
     listUsuarios: Usuario[] = [];
     query: string | null;
     loggedRole: string = "sinrol";
+    pidiendoID: boolean = false;
     idUsuario: string = '';
 
     constructor(
@@ -43,39 +44,28 @@ export class ListarUsuariosComponent implements OnInit {
 
     ngOnInit(): void { }
 
-    iniciarSesion() {
-        let id = this.sesionForm.get("id")?.value;
+    defaultClickHandler() { console.log("Nunca se debería llamar a este método"); }
 
-        if (Number(id) < 0 || isNaN(Number(id)) || id === "" || id === null || id === undefined) {
-            this.sesionForm.get("id")?.reset();
-            this.toastr.error('El ID debe ser un número positivo', 'Error');
-            return;
-        }
+    pedirID(accion: () => void) {
+        this.pidiendoID = true;
+        this.defaultClickHandler = accion;
+    }
 
+    conseguirRol(id: string): string {
+        let rol = "sinrol";
         try {
             this._usuarioService.obtenerUsuario(id, "").subscribe(
                 (data: any) => {
-                    console.log(data);
-                    this.loggedRole = data[0].rol;
-                    this.idUsuario = data[0].id;
-                    this.toastr.info('Iniciaste sesión', "Hola!");
+                    rol = data.rol;
                 },
                 (error: any) => {
                     this.toastr.error((error as any).statusText, 'Error');
-                    this.sesionForm.get("id")?.reset();
                 }
             );
         } catch (error) {
-            this.toastr.error("Usuario no encontrado", 'Error');
-            this.sesionForm.get("id")?.reset();
+            this.toastr.error((error as any).statusText, 'Error');
         }
-
-    }
-    cerrarSesion() {
-        this.toastr.info('Cerraste sesión', 'Adios!');
-        this.sesionForm.get("id")?.reset();
-        this.loggedRole = "sinrol";
-        this.listUsuarios = [];
+        return rol;
     }
 
     crearUsuario() {
@@ -102,23 +92,35 @@ export class ListarUsuariosComponent implements OnInit {
     }
 
     borrarUsuario() {
-        const id = this.idUsuario; // Assuming idUsuario is the id of the user to be deleted
-        try {
-            this._usuarioService.eliminarUsuario(id).subscribe(
-                (data: any) => {
-                    this.loggedRole = "sinrol";
-                    this.idUsuario = '';
-                    this.sesionForm.get("id")?.reset();
+        this.pedirID(() => {
+            try {
+                const id = this.sesionForm.value.id;
+                this._usuarioService.eliminarUsuario(id).subscribe(
+                    (data: any) => {
+                        this.loggedRole = "sinrol";
+                        this.idUsuario = '';
+                        this.sesionForm.get("id")?.reset();
 
-                    this.toastr.error('Usuario eliminado con exito', 'Usuario eliminado!');
-                },
-                (error: any) => {
-                    this.toastr.error((error as any).statusText, 'Error');
-                }
-            );
-        } catch (error) {
-            this.toastr.error((error as any).statusText, 'Error');
-        }
+                        this.toastr.error('Usuario eliminado con exito', 'Usuario eliminado!');
+                        this.sesionForm.get("id")?.reset();
+                        this.pidiendoID = false;
+                        this.listUsuarios = [];
+                    },
+                    (error: any) => {
+                        this.toastr.error((error as any).statusText, 'Error');
+                        this.sesionForm.get("id")?.reset();
+                        this.pidiendoID = false;
+                        this.listUsuarios = [];
+
+                    }
+                );
+            } catch (error) {
+                this.toastr.error((error as any).statusText, 'Error');
+                this.sesionForm.get("id")?.reset();
+                this.pidiendoID = false;
+                this.listUsuarios = [];
+            }
+        });
     }
 
     consultaUsuarios() {
