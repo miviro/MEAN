@@ -67,7 +67,7 @@
                         <span class="titulo">LISTADO DE LIBRETAS</span>
                         <i (click)="cambiarABusqueda();" class="fa fa-search text-primary float-end mt-2 me-2"
                             aria-hidden="true"></i>
-                        <i [routerLink]="['/admin']" (click)="cambiarACrear()"
+                        <i [routerLink]="['/admin']" (click)="cambiarACrear(); listProductos = []"
                             class="fa fa-refresh text-primary float-end mt-2 me-2" aria-hidden="true"></i>
 
                         <table *ngIf="listProductos.length >  0" class="table table-striped mt-3">
@@ -79,7 +79,7 @@
                                     <th scope="col">Tapa</th>
                                     <th scope="col">Precio</th>
                                     <th scope="col">Stock</th>
-                                    <th scope="col"></th>
+                                    <th scope="col">Iconos</th>
                                 </tr>
                             </thead>
                             <tbody>

@@ -41,7 +41,7 @@ async function obtenerRolDeID(_id) {
 }
 
 exports.obtenerRolUsuario = async(req, res) => {
-    const { _id } = req.params;
+    const _id = req.params._id;
     try {
         res.json({ rol: await obtenerRolDeID(_id) });
     } catch (error) {

@@ -60,7 +60,7 @@ export class ListarProductosComponent implements OnInit {
         }
     }
     ngOnInit(): void {
-        this.route.queryParams.subscribe(params => {
+        /*this.route.queryParams.subscribe(params => {
             if (Object.keys(params).length === 0 && params.constructor === Object) {
                 console.log("1");
                 this.obtenerProductos();
@@ -74,7 +74,7 @@ export class ListarProductosComponent implements OnInit {
                 console.log(paramsString); // Log query parameters
                 this.obtenerProductos(paramsString);
             }
-        });
+        });*/
     }
 
     defaultClickHandler() { console.log("Nunca se debería llamar a este método"); }
@@ -85,39 +85,40 @@ export class ListarProductosComponent implements OnInit {
     }
 
     obtenerProductos(params: string = '') {
-        if (params === '') {
-            // If there are no params, execute getProductos
-            this._productoService.getProductos().subscribe(data => {
-                console.log(data);
-                this.listProductos = data;
-            }, error => {
-                console.log(error);
-            });
+        this.pedirID(() => {
+            const idOrigen = this.sesionForm.value.id;
+            if (params === '') {
+                // If there are no params, execute getProductos
+                this._productoService.getProductos(idOrigen).subscribe(data => {
+                    console.log(data);
+                    this.listProductos = data;
+                }, error => {
+                    console.log(error);
+                });
 
-        } else {
-            console.log("params no es null");
-            this._productoService.buscarProductos(params).subscribe(data => {
-
-                console.log(data);
-                this.listProductos = data;
-            }, error => {
-                console.log(error);
-            });
-        }
+            } else {
+                console.log("params no es null");
+                this._productoService.buscarProductos(params, idOrigen).subscribe(data => {
+                    console.log(data);
+                    this.listProductos = data;
+                }, error => {
+                    console.log(error);
+                });
+            }
+        });
     }
-
     eliminarProducto(id: any) {
         this.pedirID(() => {
             const idUsuario = this.sesionForm.value.id;
             this._productoService.obtenerRolDeUsuario(idUsuario).subscribe(
                 (data: any) => {
-                    if (data !== "admin") {
+                    if (data.rol !== "admin") {
                         console.log(data);
                         this.toastr.error('No tiene permisos para borrar productos', 'Error');
                         this.pidiendoID = false;
                         return;
                     } else {
-                        this._productoService.eliminarProducto(id).subscribe(data => {
+                        this._productoService.eliminarProducto(id, idUsuario).subscribe(data => {
                             this.toastr.info('El producto fue eliminado con exito', 'PRODUCTO ELIMINADO!');
                             this.obtenerProductos();
                             this.pidiendoID = false;
@@ -138,7 +139,7 @@ export class ListarProductosComponent implements OnInit {
             try {
                 this._productoService.obtenerRolDeUsuario(id).subscribe(
                     (data: any) => {
-                        if (data !== "admin") {
+                        if (data.rol !== "admin") {
                             console.log(data);
                             this.toastr.error('No tiene permisos para agregar productos', 'Error');
                             this.pidiendoID = false;
@@ -165,6 +166,7 @@ export class ListarProductosComponent implements OnInit {
 
                                     // Filter out null or empty values from queryParams
                                     Object.keys(queryParams).forEach(key => (queryParams[key] == null || queryParams[key] === '') && delete queryParams[key]);
+                                    this.obtenerProductos(Object.keys(queryParams).map(key => `${key}=${queryParams[key]}`).join('&'));
                                     this.toastr.success('La búsqueda fue realizada con exito', 'BUSQUEDA REALIZADA!');
                                     this.router.navigate(['/admin'], { queryParams: queryParams as any });
                                     this.pidiendoID = false;
@@ -175,10 +177,9 @@ export class ListarProductosComponent implements OnInit {
                                     if (Object.values(PRODUCTO).some(value => value === null || value === '')) {
                                         this.toastr.error('El producto NO fue editado con exito', 'ERROR!');
                                     } else {
-                                        this._productoService.editarProducto(this.mongoForm.get("_id")?.value, PRODUCTO).subscribe(data => {
+                                        this._productoService.editarProducto(this.mongoForm.get("_id")?.value, PRODUCTO, id).subscribe(data => {
                                             this.toastr.success('El producto fue editado con exito', 'OK!');
-                                            this.obtenerProductos('');
-                                            this.router.navigate(['/admin'], {});
+                                            this.obtenerProductos();
                                             this.pidiendoID = false;
                                             this.cambiarACrear();
                                         }, error => {
@@ -188,12 +189,11 @@ export class ListarProductosComponent implements OnInit {
                                     }
                                     break;
                                 case 'Crear producto':
-                                    this._productoService.guardarProducto(PRODUCTO).subscribe(data => {
+                                    this._productoService.guardarProducto(PRODUCTO, id).subscribe(data => {
                                         this.toastr.success('El producto fue registrado con exito', 'PRODUCTO REGISTRADO!');
-                                        this.obtenerProductos('');
-                                        this.router.navigate(['/admin'], {});
                                         this.pidiendoID = false;
                                         this.cambiarACrear();
+                                        this.obtenerProductos();
                                     }, error => {
                                         console.log(error);
                                         this.toastr.error('El producto NO fue registrado con exito', 'ERROR!');
@@ -235,20 +235,23 @@ export class ListarProductosComponent implements OnInit {
         this.mongoForm.reset();
     }
     cambiarAEditar(id: string) {
-        console.log(id);
-        this.titulo = 'Editar producto';
-        this.busca = '0';
-        this.productoForm.reset();
-        this.mongoForm.reset();
-        this.mongoForm.setValue({ _id: id });
-        this._productoService.obtenerProducto(id).subscribe(data => {
-            this.productoForm.setValue({
-                color: data.color,
-                hoja: data.hoja,
-                tapa: data.tapa,
-                precio: data.precio,
-                stock: data.stock,
-            })
-        });
-    }
+        this.pedirID(() => {
+            const idOrigen = this.sesionForm.value.id;
+            console.log(id);
+            this.titulo = 'Editar producto';
+            this.busca = '0';
+            this.productoForm.reset();
+            this.mongoForm.reset();
+            this.mongoForm.setValue({ _id: id });
+            this._productoService.obtenerProducto(id, idOrigen).subscribe(data => {
+                this.productoForm.setValue({
+                    color: data.color,
+                    hoja: data.hoja,
+                    tapa: data.tapa,
+                    precio: data.precio,
+                    stock: data.stock,
+                })
+            });
+        })
+    };
 }

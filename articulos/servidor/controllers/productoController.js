@@ -1,7 +1,23 @@
 const Producto = require('../models/Producto');
+const axios = require('axios');
+
+async function fetchUserData(_id) {
+    try {
+        const response = await axios.get(`http://localhost:5000/api/usuarios/${_id}`);
+        const responseBody = response.data;
+        return responseBody;
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+        throw error;
+    }
+}
 
 exports.crearProducto = async(req, res) => {
     try {
+        let rol = await fetchUserData(req.body.idOrigen);
+        if (rol.rol !== 'admin') {
+            return res.status(401).json({ msg: 'No autorizado' });
+        }
         let producto;
         producto = new Producto(req.body);
         await producto.save();
@@ -12,7 +28,12 @@ exports.crearProducto = async(req, res) => {
     }
 };
 exports.obtenerProductos = async(req, res) => {
+    let rol = await fetchUserData(req.query.idOrigen);
     try {
+        rol = data.rol;
+        if (rol !== 'admin') {
+            return res.status(401).json({ msg: 'No autorizado' });
+        }
         const { color, hoja, tapa, precio, stock, productId } = req.query;
 
         let query = {};
@@ -55,6 +76,10 @@ exports.obtenerProductos = async(req, res) => {
 };
 exports.obtenerProducto = async(req, res) => {
     try {
+        let rol = await fetchUserData(req.params.idOrigen);
+        if (rol.rol !== 'admin') {
+            return res.status(401).json({ msg: 'No autorizado' });
+        }
         let producto = await Producto.findById(req.params.id);
 
         if (!producto) {
@@ -69,6 +94,10 @@ exports.obtenerProducto = async(req, res) => {
 
 exports.eliminarProducto = async(req, res) => {
     try {
+        let rol = await fetchUserData(req.params.idOrigen);
+        if (rol.rol !== 'admin') {
+            return res.status(401).json({ msg: 'No autorizado' });
+        }
         let producto = await Producto.findById(req.params.id);
         if (!producto) {
             res.status(404).json({ msg: 'No existe el producto' });
@@ -82,6 +111,10 @@ exports.eliminarProducto = async(req, res) => {
 };
 exports.actualizarProducto = async(req, res) => {
     try {
+        let rol = await fetchUserData(req.body.idOrigen);
+        if (rol.rol !== 'admin') {
+            return res.status(401).json({ msg: 'No autorizado' });
+        }
         const { color, hoja, tapa, precio, stock } = req.body;
         let producto = await Producto.findById(req.params.id);
 
