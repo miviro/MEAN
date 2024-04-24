@@ -85,27 +85,24 @@ export class ListarProductosComponent implements OnInit {
     }
 
     obtenerProductos(params: string = '') {
-        this.pedirID(() => {
-            const idOrigen = this.sesionForm.value.id;
-            if (params === '') {
-                // If there are no params, execute getProductos
-                this._productoService.getProductos(idOrigen).subscribe(data => {
-                    console.log(data);
-                    this.listProductos = data;
-                }, error => {
-                    console.log(error);
-                });
+        if (params === '') {
+            // If there are no params, execute getProductos
+            this._productoService.getProductos().subscribe(data => {
+                console.log(data);
+                this.listProductos = data;
+            }, error => {
+                console.log(error);
+            });
 
-            } else {
-                console.log("params no es null");
-                this._productoService.buscarProductos(params, idOrigen).subscribe(data => {
-                    console.log(data);
-                    this.listProductos = data;
-                }, error => {
-                    console.log(error);
-                });
-            }
-        });
+        } else {
+            console.log("params no es null");
+            this._productoService.buscarProductos(params).subscribe(data => {
+                console.log(data);
+                this.listProductos = data;
+            }, error => {
+                console.log(error);
+            });
+        }
     }
     eliminarProducto(id: any) {
         this.pedirID(() => {
@@ -235,23 +232,20 @@ export class ListarProductosComponent implements OnInit {
         this.mongoForm.reset();
     }
     cambiarAEditar(id: string) {
-        this.pedirID(() => {
-            const idOrigen = this.sesionForm.value.id;
-            console.log(id);
-            this.titulo = 'Editar producto';
-            this.busca = '0';
-            this.productoForm.reset();
-            this.mongoForm.reset();
-            this.mongoForm.setValue({ _id: id });
-            this._productoService.obtenerProducto(id, idOrigen).subscribe(data => {
-                this.productoForm.setValue({
-                    color: data.color,
-                    hoja: data.hoja,
-                    tapa: data.tapa,
-                    precio: data.precio,
-                    stock: data.stock,
-                })
-            });
-        })
+        console.log(id);
+        this.titulo = 'Editar producto';
+        this.busca = '0';
+        this.productoForm.reset();
+        this.mongoForm.reset();
+        this.mongoForm.setValue({ _id: id });
+        this._productoService.obtenerProducto(id).subscribe(data => {
+            this.productoForm.setValue({
+                color: data.color,
+                hoja: data.hoja,
+                tapa: data.tapa,
+                precio: data.precio,
+                stock: data.stock,
+            })
+        });
     };
 }

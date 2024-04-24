@@ -28,12 +28,7 @@ exports.crearProducto = async(req, res) => {
     }
 };
 exports.obtenerProductos = async(req, res) => {
-    let rol = await fetchUserData(req.query.idOrigen);
     try {
-        rol = data.rol;
-        if (rol !== 'admin') {
-            return res.status(401).json({ msg: 'No autorizado' });
-        }
         const { color, hoja, tapa, precio, stock, productId } = req.query;
 
         let query = {};
@@ -76,10 +71,6 @@ exports.obtenerProductos = async(req, res) => {
 };
 exports.obtenerProducto = async(req, res) => {
     try {
-        let rol = await fetchUserData(req.params.idOrigen);
-        if (rol.rol !== 'admin') {
-            return res.status(401).json({ msg: 'No autorizado' });
-        }
         let producto = await Producto.findById(req.params.id);
 
         if (!producto) {
@@ -111,7 +102,8 @@ exports.eliminarProducto = async(req, res) => {
 };
 exports.actualizarProducto = async(req, res) => {
     try {
-        let rol = await fetchUserData(req.body.idOrigen);
+        let { idOrigen } = req.body;
+        let rol = await fetchUserData(idOrigen);
         if (rol.rol !== 'admin') {
             return res.status(401).json({ msg: 'No autorizado' });
         }

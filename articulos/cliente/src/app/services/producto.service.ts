@@ -11,8 +11,8 @@ export class ProductoService {
 
     constructor(private http: HttpClient) { }
 
-    getProductos(idOrigen: string): Observable<any> {
-        return this.http.get(this.url + "?idOrigen={" + idOrigen + "}");
+    getProductos(): Observable<any> {
+        return this.http.get(this.url);
     }
 
     obtenerRolDeUsuario(id: string): Observable<any> {
@@ -23,9 +23,8 @@ export class ProductoService {
         }
     }
 
-    buscarProductos(producto: string, idOrigen: string): Observable<any> {
-
-        return this.http.get(this.url + "?idOrigen=" + idOrigen + "&" + producto);
+    buscarProductos(producto: string): Observable<any> {
+        return this.http.get(this.url + producto);
     }
 
     eliminarProducto(id: string, idOrigen: string): Observable<any> {
@@ -36,8 +35,8 @@ export class ProductoService {
         return this.http.post(this.url + "?idOrigen=" + idOrigen + "&", producto);
     }
 
-    obtenerProducto(id: string, idOrigen: string): Observable<any> {
-        return this.http.get(this.url + "?idOrigen=" + idOrigen + "&" + id);
+    obtenerProducto(id: string): Observable<any> {
+        return this.http.get(this.url + id);
     }
 
     editarProducto(id: string, producto: Producto, idOrigen: string): Observable<any> {
