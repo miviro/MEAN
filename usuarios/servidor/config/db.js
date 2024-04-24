@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 require('dotenv').config({ path: 'variables.env' });
-const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const conectarDB = async() => {
     try {

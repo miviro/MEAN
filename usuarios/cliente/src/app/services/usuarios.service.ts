@@ -11,22 +11,22 @@ export class UsuarioService {
 
     constructor(private http: HttpClient) { }
 
-    eliminarUsuario(id: string): Observable<any> {
-        return this.http.delete(this.url + id);
+    eliminarUsuario(_id: string): Observable<any> {
+        return this.http.delete(this.url + _id);
     }
 
     crearUsuario(usuario: Usuario): Observable<any> {
-        return this.http.post(this.url, usuario);
+        return this.http.post(this.url, { rol: usuario.rol });
     }
 
-    obtenerUsuario(id: string, rol: string): Observable<any> {
-        let query = '';
-        if (id && rol && id !== '' && rol !== '') {
-            query = `?id=${id}&rol=${rol}`;
-        } else if (id && id !== '') {
-            query = `?id=${id}`;
+    obtenerUsuario(_id: string, rol: string, idOrigen: string): Observable<any> {
+        let query = '?idOrigen=' + idOrigen + '&';
+        if (_id && rol && _id !== '' && rol !== '') {
+            query += `_id=${_id}&rol=${rol}`;
+        } else if (_id && _id !== '') {
+            query += `_id=${_id}`;
         } else if (rol && rol !== '') {
-            query = `?rol=${rol}`;
+            query += `rol=${rol}`;
         }
 
         return this.http.get(this.url + query);

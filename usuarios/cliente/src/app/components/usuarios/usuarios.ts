@@ -16,28 +16,22 @@ export class ListarUsuariosComponent implements OnInit {
     crearForm: FormGroup;
     titulo = 'Introduzca su ID';
     listUsuarios: Usuario[] = [];
-    query: string | null;
-    loggedRole: string = "sinrol";
     pidiendoID: boolean = false;
-    idUsuario: string = '';
 
     constructor(
         private _usuarioService: UsuarioService,
         private toastr: ToastrService,
-        private route: ActivatedRoute, // Inject ActivatedRoute
         private fb: FormBuilder,
-        private router: Router,
     ) {
-        this.query = this.route.snapshot.paramMap.get('query');
         this.sesionForm = this.fb.group({
-            id: ['', Validators.required],
+            _id: ['', Validators.required],
         })
         this.consultaForm = this.fb.group({
-            id: ['', Validators.required],
+            _id: ['', Validators.required],
             rol: ['', Validators.required],
         })
         this.crearForm = this.fb.group({
-            id: ['', Validators.required],
+            _id: ['', Validators.required],
             rol: ['', Validators.required],
         })
     }
@@ -51,33 +45,17 @@ export class ListarUsuariosComponent implements OnInit {
         this.defaultClickHandler = accion;
     }
 
-    conseguirRol(id: string): string {
-        let rol = "sinrol";
-        try {
-            this._usuarioService.obtenerUsuario(id, "").subscribe(
-                (data: any) => {
-                    rol = data.rol;
-                },
-                (error: any) => {
-                    this.toastr.error((error as any).statusText, 'Error');
-                }
-            );
-        } catch (error) {
-            this.toastr.error((error as any).statusText, 'Error');
-        }
-        return rol;
-    }
-
     crearUsuario() {
         const rol = this.crearForm.value.rol;
         if (!rol) {
             this.toastr.error('Debe seleccionar un rol', 'Error');
+            this.reestablecerTodo();
             return;
         }
         try {
             this._usuarioService.crearUsuario(this.crearForm.value).subscribe(
                 (data: any) => {
-                    let aux = "ID: " + data.id + " Rol: " + data.rol;
+                    let aux = "ID: " + data._id + " Rol: " + data.rol;
                     this.toastr.success(aux, 'Usuario creado!');
                 },
                 (error: any) => {
@@ -86,65 +64,65 @@ export class ListarUsuariosComponent implements OnInit {
             );
         } catch (error) {
             this.toastr.error((error as any).statusText, 'Error');
-            this.sesionForm.get("id")?.reset();
         }
-
+        this.reestablecerTodo();
     }
 
     borrarUsuario() {
         this.pedirID(() => {
             try {
-                const id = this.sesionForm.value.id;
-                if (id == "" || id == null || id == undefined || id == " ") {
+                const _id = this.sesionForm.value._id;
+                if (_id == "" || _id == null || _id == undefined || _id == " ") {
                     this.toastr.error('Debe introducir un ID', 'Error');
                     return;
                 }
-                this._usuarioService.eliminarUsuario(id).subscribe(
+                this._usuarioService.eliminarUsuario(_id).subscribe(
                     (data: any) => {
-                        this.loggedRole = "sinrol";
-                        this.idUsuario = '';
-                        this.sesionForm.get("id")?.reset();
-
                         this.toastr.error('Usuario eliminado con exito', 'Usuario eliminado!');
-                        this.sesionForm.get("id")?.reset();
-                        this.pidiendoID = false;
-                        this.listUsuarios = [];
                     },
                     (error: any) => {
                         this.toastr.error((error as any).statusText, 'Error');
-                        this.sesionForm.get("id")?.reset();
-                        this.pidiendoID = false;
-                        this.listUsuarios = [];
                     }
                 );
             } catch (error) {
                 this.toastr.error((error as any).statusText, 'Error');
-                this.sesionForm.get("id")?.reset();
-                this.pidiendoID = false;
-                this.listUsuarios = [];
             }
+            this.reestablecerTodo();
         });
     }
 
     consultaUsuarios() {
         this.pedirID(() => {
-            const id = this.consultaForm.value.id;
+            const _id = this.consultaForm.value._id;
             const rol = this.consultaForm.value.rol;
+            const idOrigen = this.sesionForm.value._id;
 
             try {
-                this._usuarioService.obtenerUsuario(id, rol).subscribe(
+                this._usuarioService.obtenerUsuario(_id, rol, idOrigen).subscribe(
                     (data: any) => {
+                        this.reestablecerTodo();
                         this.listUsuarios = data;
                         this.toastr.info('Consulta realizada con exito', 'Consulta realizada!');
                     },
                     (error: any) => {
-                        this.listUsuarios = [];
                         this.toastr.error((error as any).statusText, 'Error');
+                        this.reestablecerTodo();
                     }
                 );
             } catch (error) {
                 this.toastr.error((error as any).statusText, 'Error');
+                this.reestablecerTodo();
             }
         });
+    }
+
+    reestablecerTodo() {
+        this.listUsuarios = [];
+        this.sesionForm.get("_id")?.reset();
+        this.consultaForm.get("_id")?.reset();
+        this.consultaForm.get("rol")?.reset();
+        this.crearForm.get("_id")?.reset();
+        this.crearForm.get("rol")?.reset();
+        this.pidiendoID = false;
     }
 }

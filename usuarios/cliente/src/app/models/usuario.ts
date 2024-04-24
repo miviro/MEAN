@@ -1,9 +1,9 @@
 export class Usuario {
-    id: string;
+    _id: string;
     rol: string;
 
-    constructor(id: string, rol: string) {
-        this.id = id;
+    constructor(_id: string, rol: string) {
+        this._id = _id;
         this.rol = rol;
     }
 }

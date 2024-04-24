@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const UsuarioSchema = mongoose.Schema({
     rol: {
@@ -7,6 +6,5 @@ const UsuarioSchema = mongoose.Schema({
         required: true,
     }
 });
-UsuarioSchema.plugin(AutoIncrement, { inc_field: 'id' });
 
 module.exports = mongoose.model('Usuario', UsuarioSchema);

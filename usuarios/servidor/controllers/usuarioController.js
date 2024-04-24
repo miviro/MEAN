@@ -12,12 +12,13 @@ exports.crearUsuario = async(req, res) => {
 };
 exports.obtenerUsuarios = async(req, res) => {
     try {
-        const { idOrigen, id, rol } = req.query;
+        const { idOrigen, _id, rol } = req.query;
         let query = {};
-        if (idOrigen != "admin") {
+        let rolOrigen = await obtenerRolDeID(idOrigen);
+        if (rolOrigen != "admin") {
             return res.status(403).json({ message: 'No tienes permisos para realizar esta acción.' });
         }
-        if (id) { query.id = id; }
+        if (_id) { query._id = _id; }
         if (rol) { query.rol = rol; }
 
         const usuario = await Usuario.find(query);
@@ -31,27 +32,27 @@ exports.obtenerUsuarios = async(req, res) => {
     }
 };
 
-exports.obtenerRolUsuario = async(req, res) => {
-    try {
-        const { id } = req.params;
-        let query = {};
-        if (id) { query.id = id; }
+async function obtenerRolDeID(_id) {
+    let rol = (await Usuario.findById(_id)).rol;
+    if (!rol || rol === "" || rol === null || rol === undefined || rol === "undefined" || rol === "null") {
+        throw new Error('Rol no encontrado');
+    }
+    return rol;
+}
 
-        const usuario = await Usuario.findOne(query);
-        if (!usuario) {
-            return res.status(404).json({ message: 'Usuario no encontrado' });
-        }
-        res.json(usuario.rol);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Internal Server Error' });
+exports.obtenerRolUsuario = async(req, res) => {
+    const { _id } = req.params;
+    try {
+        res.json({ rol: await obtenerRolDeID(_id) });
+    } catch (error) {
+        return res.status(404).json({ message: 'Usuario no encontrado' });
     }
 }
 
 exports.eliminarUsuario = async(req, res) => {
     try {
-        const { id } = req.params;
-        const usuario = await Usuario.findOneAndDelete({ id });
+        const { _id } = req.params;
+        const usuario = await Usuario.findOneAndDelete({ _id });
         if (!usuario) {
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
