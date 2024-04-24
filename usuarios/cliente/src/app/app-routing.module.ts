@@ -5,8 +5,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { ListarUsuariosComponent } from './components/usuarios/usuarios';
 
 const routes: Routes = [
-    { path: 'admin', component: ListarUsuariosComponent, pathMatch: 'full' },
-    { path: '**', redirectTo: 'admin', pathMatch: 'full' }
+    { path: 'usuarios', component: ListarUsuariosComponent, pathMatch: 'full' },
+    { path: '**', redirectTo: 'usuarios', pathMatch: 'full' }
 ];
 
 @NgModule({

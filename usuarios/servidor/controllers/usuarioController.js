@@ -12,8 +12,11 @@ exports.crearUsuario = async(req, res) => {
 };
 exports.obtenerUsuarios = async(req, res) => {
     try {
-        const { id, rol } = req.query;
+        const { idOrigen, id, rol } = req.query;
         let query = {};
+        if (idOrigen != "admin") {
+            return res.status(403).json({ message: 'No tienes permisos para realizar esta acción.' });
+        }
         if (id) { query.id = id; }
         if (rol) { query.rol = rol; }
 
@@ -27,6 +30,23 @@ exports.obtenerUsuarios = async(req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
+exports.obtenerRolUsuario = async(req, res) => {
+    try {
+        const { id } = req.params;
+        let query = {};
+        if (id) { query.id = id; }
+
+        const usuario = await Usuario.findOne(query);
+        if (!usuario) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+        res.json(usuario.rol);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
 
 exports.eliminarUsuario = async(req, res) => {
     try {

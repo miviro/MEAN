@@ -95,6 +95,10 @@ export class ListarUsuariosComponent implements OnInit {
         this.pedirID(() => {
             try {
                 const id = this.sesionForm.value.id;
+                if (id == "" || id == null || id == undefined || id == " ") {
+                    this.toastr.error('Debe introducir un ID', 'Error');
+                    return;
+                }
                 this._usuarioService.eliminarUsuario(id).subscribe(
                     (data: any) => {
                         this.loggedRole = "sinrol";
@@ -111,7 +115,6 @@ export class ListarUsuariosComponent implements OnInit {
                         this.sesionForm.get("id")?.reset();
                         this.pidiendoID = false;
                         this.listUsuarios = [];
-
                     }
                 );
             } catch (error) {
@@ -124,23 +127,24 @@ export class ListarUsuariosComponent implements OnInit {
     }
 
     consultaUsuarios() {
-        const id = this.consultaForm.value.id;
-        const rol = this.consultaForm.value.rol;
+        this.pedirID(() => {
+            const id = this.consultaForm.value.id;
+            const rol = this.consultaForm.value.rol;
 
-        try {
-            this._usuarioService.obtenerUsuario(id, rol).subscribe(
-                (data: any) => {
-                    this.listUsuarios = data;
-                    this.toastr.info('Consulta realizada con exito', 'Consulta realizada!');
-                },
-                (error: any) => {
-                    this.listUsuarios = [];
-                    this.toastr.error((error as any).statusText, 'Error');
-                }
-            );
-        } catch (error) {
-            this.toastr.error((error as any).statusText, 'Error');
-        }
-        this.toastr.info('Consulta realizada con exito', 'Consulta realizada!');
+            try {
+                this._usuarioService.obtenerUsuario(id, rol).subscribe(
+                    (data: any) => {
+                        this.listUsuarios = data;
+                        this.toastr.info('Consulta realizada con exito', 'Consulta realizada!');
+                    },
+                    (error: any) => {
+                        this.listUsuarios = [];
+                        this.toastr.error((error as any).statusText, 'Error');
+                    }
+                );
+            } catch (error) {
+                this.toastr.error((error as any).statusText, 'Error');
+            }
+        });
     }
 }
