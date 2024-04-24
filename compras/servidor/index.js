@@ -1,18 +1,17 @@
 const express = require('express');
-const { conectarDB, poblarDB } = require('./config/db');
+const { conectarDB } = require('./config/db');
 const cors = require("cors");
 
 const app = express();
 
 conectarDB();
-poblarDB();
 app.use(cors());
 
 
 app.use(express.json());
-app.use("/api/productos", require('./routes/producto'));
+app.use("/api/compras", require('./routes/compra'));
 
 
-app.listen(4000, () => {
-    console.log('Server is running on port 3000');
+app.listen(6000, () => {
+    console.log('Server is running on port 6000');
 });

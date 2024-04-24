@@ -3,7 +3,7 @@ require('dotenv').config({ path: 'variables.env' });
 
 const conectarDB = async() => {
     try {
-        await mongoose.connect("mongodb://127.0.0.1:27017/usuarios");
+        await mongoose.connect("mongodb://127.0.0.1:27017/mean");
         console.log('DB Conectada');
     } catch (error) {
         console.log('Hubo un error');
