@@ -15,6 +15,14 @@ export class ProductoService {
         return this.http.get(this.url);
     }
 
+    obtenerRolDeUsuario(id: string): Observable<any> {
+        if (id && id !== '') {
+            return this.http.get('http://localhost:5000/api/usuarios/' + id);
+        } else {
+            throw new Error("ID de usuario no válido");
+        }
+    }
+
     buscarProductos(producto: string): Observable<any> {
 
         return this.http.get(this.url + "?" + producto);

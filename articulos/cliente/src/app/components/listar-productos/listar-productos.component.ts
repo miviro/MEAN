@@ -14,11 +14,13 @@ import { switchScan } from 'rxjs';
 export class ListarProductosComponent implements OnInit {
     productoForm: FormGroup;
     mongoForm: FormGroup;
+    sesionForm: FormGroup;
     titulo = 'Crear producto';
     id: string | null;
     busca: string | null;
     listProductos: Producto[] = [];
     query: string | null;
+    pidiendoID: boolean = false;
 
     constructor(
         private _productoService: ProductoService,
@@ -29,6 +31,9 @@ export class ListarProductosComponent implements OnInit {
     ) {
         this.query = this.route.snapshot.paramMap.get('query');
         this.busca = this.route.snapshot.paramMap.get('busca');
+        this.sesionForm = this.fb.group({
+            id: ['', Validators.required],
+        })
         if (this.busca === '1') {
             this.productoForm = this.fb.group({
                 color: [''],
@@ -72,8 +77,14 @@ export class ListarProductosComponent implements OnInit {
         });
     }
 
+    defaultClickHandler() { console.log("Nunca se debería llamar a este método"); }
+
+    pedirID(accion: () => void) {
+        this.pidiendoID = true;
+        this.defaultClickHandler = accion;
+    }
+
     obtenerProductos(params: string = '') {
-        // Check if there are any params in the URL
         if (params === '') {
             // If there are no params, execute getProductos
             this._productoService.getProductos().subscribe(data => {
@@ -96,72 +107,117 @@ export class ListarProductosComponent implements OnInit {
     }
 
     eliminarProducto(id: any) {
-        this._productoService.eliminarProducto(id).subscribe(data => {
-            this.toastr.info('El producto fue eliminado con exito', 'PRODUCTO ELIMINADO!');
-            this.obtenerProductos();
-
-        }, error => {
-            console.log(error);
+        this.pedirID(() => {
+            const idUsuario = this.sesionForm.value.id;
+            this._productoService.obtenerRolDeUsuario(idUsuario).subscribe(
+                (data: any) => {
+                    if (data !== "admin") {
+                        console.log(data);
+                        this.toastr.error('No tiene permisos para borrar productos', 'Error');
+                        this.pidiendoID = false;
+                        return;
+                    } else {
+                        this._productoService.eliminarProducto(id).subscribe(data => {
+                            this.toastr.info('El producto fue eliminado con exito', 'PRODUCTO ELIMINADO!');
+                            this.obtenerProductos();
+                            this.pidiendoID = false;
+                        });
+                    }
+                },
+                (error: any) => {
+                    this.toastr.error((error as any).statusText, 'Error');
+                    this.pidiendoID = false;
+                });
         });
     }
-    agregarProducto(id: string) {
-        let PRODUCTO: Producto = {
-            color: this.productoForm.get('color')?.value,
-            hoja: this.productoForm.get('hoja')?.value,
-            tapa: this.productoForm.get('tapa')?.value,
-            precio: this.productoForm.get('precio')?.value,
-            stock: this.productoForm.get('stock')?.value,
-        }
-        switch (this.titulo) {
-            case 'Buscar productos':
-                const queryParams: { [key: string]: string | number } = {
-                    color: PRODUCTO.color,
-                    hoja: PRODUCTO.hoja,
-                    tapa: PRODUCTO.tapa,
-                    precio: PRODUCTO.precio,
-                    stock: PRODUCTO.stock,
-                    productId: this.mongoForm.get('_id')?.value
-                };
+    agregarProducto() {
+        this.pedirID(() => {
+            const id = this.sesionForm.value.id;
+            console.log(id);
 
-                // Filter out null or empty values from queryParams
-                Object.keys(queryParams).forEach(key => (queryParams[key] == null || queryParams[key] === '') && delete queryParams[key]);
-                this.toastr.success('La búsqueda fue realizada con exito', 'BUSQUEDA REALIZADA!');
-                this.router.navigate(['/admin'], { queryParams: queryParams as any });
-                break;
-            case 'Editar producto':
-                //editamos producto
-                if (Object.values(PRODUCTO).some(value => value === null || value === '')) {
-                    this.toastr.error('El producto NO fue editado con exito', 'ERROR!');
-                } else {
-                    this._productoService.editarProducto(this.mongoForm.get("_id")?.value, PRODUCTO).subscribe(data => {
-                        this.toastr.success('El producto fue editado con exito', 'OK!');
-                        this.obtenerProductos('');
-                        this.router.navigate(['/admin'], {});
-                        this.cambiarACrear();
-                    }, error => {
-                        console.log(error);
-                        this.toastr.error('El producto NO fue editado con exito', 'ERROR!');
-                    });
-                }
-                break;
-            case 'Crear producto':
-                this._productoService.guardarProducto(PRODUCTO).subscribe(data => {
-                    this.toastr.success('El producto fue registrado con exito', 'PRODUCTO REGISTRADO!');
-                    this.obtenerProductos('');
-                    this.router.navigate(['/admin'], {});
-                    this.cambiarACrear();
-                }, error => {
-                    console.log(error);
-                    this.toastr.error('El producto NO fue registrado con exito', 'ERROR!');
+            try {
+                this._productoService.obtenerRolDeUsuario(id).subscribe(
+                    (data: any) => {
+                        if (data !== "admin") {
+                            console.log(data);
+                            this.toastr.error('No tiene permisos para agregar productos', 'Error');
+                            this.pidiendoID = false;
+                            return;
+                        } else {
+                            console.log(data);
+                            let PRODUCTO: Producto = {
+                                color: this.productoForm.get('color')?.value,
+                                hoja: this.productoForm.get('hoja')?.value,
+                                tapa: this.productoForm.get('tapa')?.value,
+                                precio: this.productoForm.get('precio')?.value,
+                                stock: this.productoForm.get('stock')?.value,
+                            }
+                            switch (this.titulo) {
+                                case 'Buscar productos':
+                                    const queryParams: { [key: string]: string | number } = {
+                                        color: PRODUCTO.color,
+                                        hoja: PRODUCTO.hoja,
+                                        tapa: PRODUCTO.tapa,
+                                        precio: PRODUCTO.precio,
+                                        stock: PRODUCTO.stock,
+                                        productId: this.mongoForm.get('_id')?.value
+                                    };
 
-                    this.productoForm.reset();
-                    this.mongoForm.reset();
-                })
-                break
-            default:
-                this.toastr.error('Error cliente', 'ERROR!');
-                break;
-        }
+                                    // Filter out null or empty values from queryParams
+                                    Object.keys(queryParams).forEach(key => (queryParams[key] == null || queryParams[key] === '') && delete queryParams[key]);
+                                    this.toastr.success('La búsqueda fue realizada con exito', 'BUSQUEDA REALIZADA!');
+                                    this.router.navigate(['/admin'], { queryParams: queryParams as any });
+                                    this.pidiendoID = false;
+
+                                    break;
+                                case 'Editar producto':
+                                    //editamos producto
+                                    if (Object.values(PRODUCTO).some(value => value === null || value === '')) {
+                                        this.toastr.error('El producto NO fue editado con exito', 'ERROR!');
+                                    } else {
+                                        this._productoService.editarProducto(this.mongoForm.get("_id")?.value, PRODUCTO).subscribe(data => {
+                                            this.toastr.success('El producto fue editado con exito', 'OK!');
+                                            this.obtenerProductos('');
+                                            this.router.navigate(['/admin'], {});
+                                            this.pidiendoID = false;
+                                            this.cambiarACrear();
+                                        }, error => {
+                                            console.log(error);
+                                            this.toastr.error('El producto NO fue editado con exito', 'ERROR!');
+                                        });
+                                    }
+                                    break;
+                                case 'Crear producto':
+                                    this._productoService.guardarProducto(PRODUCTO).subscribe(data => {
+                                        this.toastr.success('El producto fue registrado con exito', 'PRODUCTO REGISTRADO!');
+                                        this.obtenerProductos('');
+                                        this.router.navigate(['/admin'], {});
+                                        this.pidiendoID = false;
+                                        this.cambiarACrear();
+                                    }, error => {
+                                        console.log(error);
+                                        this.toastr.error('El producto NO fue registrado con exito', 'ERROR!');
+                                        this.pidiendoID = false;
+
+                                        this.productoForm.reset();
+                                        this.mongoForm.reset();
+                                    })
+                                    break
+                                default:
+                                    this.toastr.error('Error cliente', 'ERROR!');
+                                    break;
+                            }
+                        }
+                    },
+                    (error: any) => {
+                        this.toastr.error((error as any).statusText, 'Error');
+                        return;
+                    }
+                );
+            } catch (error) {
+                this.toastr.error((error as any).statusText, 'Error');
+            }
+        });
     }
 
     cambiarACrear() {
