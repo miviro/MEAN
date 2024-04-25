@@ -31,33 +31,16 @@ exports.crearCompra = async(req, res) => {
 
 exports.obtenerCompras = async(req, res) => {
     try {
-        const { color, hoja, tapa, precio, stock, productId } = req.query;
+        const { idArticulo, idCliente, cantidad, nombreComprador, direccion } = req.query;
 
         let query = {};
 
-        if (color) {
-            query.color = color;
-        }
+        if (idArticulo) { query.idArticulo = idArticulo; }
+        if (idCliente) { query.idCliente = idCliente; }
+        if (cantidad !== undefined) { query.cantidad = parseFloat(cantidad); }
+        if (nombreComprador) { query.nombreComprador = nombreComprador; }
+        if (direccion) { query.direccion = direccion; }
 
-        if (hoja) {
-            query.hoja = hoja;
-        }
-
-        if (tapa) {
-            query.tapa = tapa;
-        }
-
-        if (precio !== undefined) {
-            query.precio = parseFloat(precio);
-        }
-
-        if (stock !== undefined) {
-            query.stock = parseFloat(stock);
-        }
-
-        if (productId) {
-            query._id = productId;
-        }
         const products = await Compra.find(query);
         res.json(products);
     } catch (err) {
@@ -65,6 +48,28 @@ exports.obtenerCompras = async(req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
+exports.obtenerProductos = async(req, res) => {
+    try {
+        const { color, hoja, tapa, precio, stock, productId } = req.query;
+
+        let query = {};
+
+        if (color) { query.color = color; }
+        if (hoja) { query.hoja = hoja; }
+        if (tapa) { query.tapa = tapa; }
+        if (precio !== undefined) { query.precio = parseFloat(precio); }
+        if (stock !== undefined) { query.stock = parseFloat(stock); }
+        if (productId) { query._id = productId; }
+
+        const products = await Producto.find(query);
+        res.json(products);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
+
 exports.obtenerCompra = async(req, res) => {
     try {
         let compra = await Compra.findById(req.params.id);
@@ -94,18 +99,15 @@ exports.eliminarCompra = async(req, res) => {
 };
 exports.actualizarCompra = async(req, res) => {
     try {
-        const { color, hoja, tapa, precio, stock } = req.body;
+        const { nombreComprador, direccion } = req.body;
         let compra = await Compra.findById(req.params.id);
 
         if (!compra) {
-            res.status(404).json({ msg: 'No existe el compra' });
+            return res.status(404).json({ msg: 'No existe la compra' });
         }
 
-        compra.color = color;
-        compra.hoja = hoja;
-        compra.tapa = tapa;
-        compra.precio = precio;
-        compra.stock = stock;
+        compra.nombreComprador = nombreComprador;
+        compra.direccion = direccion;
 
         compra = await Compra.findOneAndUpdate({
             _id: req.params.id
