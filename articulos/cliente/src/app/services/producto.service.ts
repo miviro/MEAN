@@ -11,35 +11,41 @@ export class ProductoService {
 
     constructor(private http: HttpClient) { }
 
-    getProductos(): Observable<any> {
-        return this.http.get(this.url);
+    getProductos(idOrigen: string): Observable<any> {
+        return this.http.get(this.url + "?idOrigen=" + idOrigen);
     }
 
-    obtenerRolDeUsuario(id: string): Observable<any> {
+    obtenerRolDeUsuario(id: string, idOrigen: string): Observable<any> {
         if (id && id !== '') {
-            return this.http.get('http://localhost:5000/api/usuarios/' + id);
+            return this.http.get('http://localhost:5000/api/usuarios/' + id + '?idOrigen=' + idOrigen);
         } else {
             throw new Error("ID de usuario no válido");
         }
     }
 
-    buscarProductos(producto: string): Observable<any> {
-        return this.http.get(this.url + producto);
+    buscarProductos(producto: string, idOrigen: string): Observable<any> {
+        if (producto === '') {
+            return this.http.get(this.url + "?idOrigen=" + idOrigen);
+        }
+        return this.http.get(this.url + producto + "&idOrigen=" + idOrigen);
     }
 
     eliminarProducto(id: string, idOrigen: string): Observable<any> {
-        return this.http.delete(this.url + "?idOrigen=" + idOrigen + "&" + id);
+        return this.http.delete(this.url + id + "?idOrigen=" + idOrigen);
     }
 
     guardarProducto(producto: Producto, idOrigen: string): Observable<any> {
         return this.http.post(this.url + "?idOrigen=" + idOrigen + "&", producto);
     }
 
-    obtenerProducto(id: string): Observable<any> {
-        return this.http.get(this.url + id);
+    obtenerProducto(id: string, idOrigen: string): Observable<any> {
+        if (id === '') {
+            throw new Error("ID de producto no válido");
+        }
+        return this.http.get(this.url + id + "?idOrigen=" + idOrigen);
     }
 
     editarProducto(id: string, producto: Producto, idOrigen: string): Observable<any> {
-        return this.http.put(this.url + "?idOrigen=" + idOrigen + "&" + id, producto);
+        return this.http.put(this.url + id + "?idOrigen=" + idOrigen, producto);
     }
 }
