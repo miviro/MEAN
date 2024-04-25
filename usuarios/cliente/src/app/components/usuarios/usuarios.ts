@@ -97,6 +97,10 @@ export class ListarUsuariosComponent implements OnInit {
             const rol = this.consultaForm.value.rol;
             const idOrigen = this.sesionForm.value._id;
 
+            if (idOrigen == "" || idOrigen == null || idOrigen == undefined || idOrigen == " ") {
+                this.toastr.error('Debe introducir un ID', 'Error');
+                return;
+            }
             try {
                 this._usuarioService.obtenerUsuario(_id, rol, idOrigen).subscribe(
                     (data: any) => {

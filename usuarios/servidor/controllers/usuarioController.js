@@ -14,6 +14,9 @@ exports.obtenerUsuarios = async(req, res) => {
     try {
         const { idOrigen, _id, rol } = req.query;
         let query = {};
+        if (idOrigen === undefined || idOrigen === null || idOrigen === "" || idOrigen === "undefined" || idOrigen === "null") {
+            return res.status(400).json({ message: 'ID de origen no especificado' });
+        }
         let rolOrigen = await obtenerRolDeID(idOrigen);
         if (rolOrigen != "admin") {
             return res.status(403).json({ message: 'No tienes permisos para realizar esta acción.' });
