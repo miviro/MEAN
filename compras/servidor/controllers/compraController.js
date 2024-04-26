@@ -25,7 +25,7 @@ exports.crearCompra = async(req, res) => {
         if (assertCorrectRole((await fetchUserData(idOrigen)))) {
             let compra;
             compra = new Compra(req.body);
-            if (idOrigen !== req.body.idUsuario) {
+            if (idOrigen !== req.body.idCliente) {
                 return res.status(401).json({ msg: 'El ID de origen y el del cliente debe ser el mismo' });
             }
 
@@ -34,8 +34,8 @@ exports.crearCompra = async(req, res) => {
                 return res.status(400).json({ msg: 'No hay suficiente stock' });
             }
 
-            if (req.body.idUsuario) {
-                const usuario = await Usuario.findById(req.body.idUsuario);
+            if (req.body.idCliente) {
+                const usuario = await Usuario.findById(req.body.idCliente);
                 if (!usuario) {
                     return res.status(400).json({ msg: 'Cliente no encontrado' });
                 }
@@ -132,6 +132,13 @@ exports.eliminarCompra = async(req, res) => {
             if (!compra) {
                 res.status(404).json({ msg: 'No existe el compra' });
             }
+
+            // actualizar stock
+            let unidadesCanceladas = compra.cantidad;
+            let stockDisponible = (await Producto.findById(compra.idArticulo)).stock;
+            stockDisponible += unidadesCanceladas;
+            Producto.findByIdAndUpdate(compra.idArticulo, { stock: stockDisponible });
+
             await Compra.deleteOne({ _id: req.params.id });
             res.json({ msg: 'Compra eliminado' });
         } else {

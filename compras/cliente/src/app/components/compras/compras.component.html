@@ -1,0 +1,137 @@
+<div class="container mt-mt5">
+    <!-- PEDIR ID -->
+    <div class="card" *ngIf="pidiendoID">
+        <div class="card-body text-center">
+            <span class="titulo"> {{ "Introduzca su ID" | uppercase }}</span>
+            <form class="mt-3" [formGroup]="sesionForm" (ngSubmit)="defaultClickHandler()">
+                <div class="mb-3">
+                    <input type="text" formControlName="id" class="form-control form-control-lg"
+                        placeholder="Introduzca su ID">
+                    <button class="btn btn-success float-end" type="submit">Continuar</button>
+                    <button type="button" class="btn btn-danger float-end"
+                        (click)="pidiendoID = false;">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- CONSULTA ARTICULOS -->
+    <div *ngIf="!pidiendoID">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <span class="titulo"> {{ "Búsqueda de artículos" | uppercase }}</span>
+                        <form class="mt-3" [formGroup]="productoForm" (ngSubmit)="buscarProducto()">
+                            <div class="mb-3">
+                                <input type="text" formControlName="_id" class="form-control form-control-lg"
+                                    placeholder="ID Mongo">
+                            </div>
+                            <div class="mb-3">
+                                <input type="text" formControlName="color" class="form-control form-control-lg"
+                                    placeholder="Color">
+                            </div>
+                            <div class="mb-3">
+                                <input type="text" formControlName="hoja" class="form-control form-control-lg"
+                                    placeholder="Hoja">
+                            </div>
+                            <div class="mb-3">
+                                <input type="text" formControlName="tapa" class="form-control form-control-lg"
+                                    placeholder="Tapa">
+                            </div>
+                            <div class="mb-3">
+                                <input type="number" formControlName="precio" class="form-control form-control-lg"
+                                    placeholder="Precio">
+                            </div>
+                            <div class="mb-3">
+                                <input type="number" formControlName="stock" class="form-control form-control-lg"
+                                    placeholder="Stock">
+                            </div>
+                            <button class="btn btn-success float-end" type="submit">BUSCAR</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- COMPRA ARTICULO -->
+        <div *ngIf="comprandoProducto">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <span class="titulo"> {{ "Compra de artículos" | uppercase }}</span>
+                            <form class="mt-3" [formGroup]="compraForm" (ngSubmit)="comprarProducto()">
+                                <div class="mb-3">
+                                    <input type="text" formControlName="idArticulo" class="form-control form-control-lg"
+                                        placeholder="ID Articulo">
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" formControlName="cantidad" class="form-control form-control-lg"
+                                        placeholder="Color">
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" formControlName="nombreComprador"
+                                        class="form-control form-control-lg" placeholder="Nombre del comprador">
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" formControlName="direccion" class="form-control form-control-lg"
+                                        placeholder="Dirección">
+                                </div>
+                                <button class="btn btn-success float-end" type="submit">COMPRAR</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- LISTA ARTICULOS -->
+    <div *ngIf="!pidiendoID" class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card">
+                <div class="card-body text-center">
+                    <span class="titulo">LISTADO DE LIBRETAS</span>
+                    <i (click)="listProductos = []" class="fa fa-refresh text-primary float-end mt-2 me-2"
+                        aria-hidden="true"></i>
+
+                    <table *ngIf="listProductos.length >  0" class="table table-striped mt-3">
+                        <thead>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Color</th>
+                                <th scope="col">Hoja</th>
+                                <th scope="col">Tapa</th>
+                                <th scope="col">Precio</th>
+                                <th scope="col">Stock</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let producto of listProductos">
+                                <td>{{ producto._id }}</td>
+                                <td>{{ producto.color }}</td>
+                                <td>{{ producto.hoja }}</td>
+                                <td>{{ producto.tapa }}</td>
+                                <td>{{ producto.precio}}</td>
+                                <td>{{ producto.stock }}</td>
+                                <td>
+                                    <i (click)="hacerCompra(producto._id)" class="fa fa-money text-primary"
+                                        aria-hidden="true"></i>
+
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <span style="text-align: start; margin-top: 10px;" *ngIf="listProductos.length == 0">No hay
+                        productos para mostrar
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CONSULTA COMPRA -->
+    <!-- MODIFICACION COMPRA -->
+    <!-- ELIMINACION COMPRA -->
+</div>
