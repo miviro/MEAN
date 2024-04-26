@@ -70,6 +70,12 @@ export class ComprasComponent implements OnInit {
         this.pidiendoID = true;
         this.defaultClickHandler = accion;
     }
+    actualizar() {
+        this.listProductos = [];
+        this.listCompras = [];
+        this.comprandoProducto = false;
+        this.pidiendoID = false;
+    }
 
     buscarProducto() {
         this.pedirID(() => {
@@ -99,7 +105,7 @@ export class ComprasComponent implements OnInit {
             }, error => {
                 console.log(JSON.stringify(error));
                 this.toastr.error((error as any).statusText, 'Error');
-                this.listProductos = [];
+                this.actualizar();
             });
             this.pidiendoID = false;
         });
@@ -124,18 +130,16 @@ export class ComprasComponent implements OnInit {
             COMPRA.idCliente = idOrigen;
             try {
                 this._productoService.guardarCompra(COMPRA, idOrigen).subscribe(data => {
-                    this.toastr.success('Compra realizada', 'Correcto');
-                    this.listProductos = [];
-                    this.comprandoProducto = false;
-                    this.pidiendoID = false;
+                    this.toastr.success("ID de la compra: " + data._id, 'Correcto');
+                    this.actualizar();
                 }, error => {
                     console.log(JSON.stringify(error));
                     this.toastr.error((error as any).statusText, 'Error');
-                    this.comprandoProducto = false;
+                    this.actualizar();
                 });
             } catch (error) {
                 this.toastr.error((error as any).statusText, 'Error');
-                this.comprandoProducto = false;
+                this.actualizar();
             }
         });
     }
@@ -165,10 +169,11 @@ export class ComprasComponent implements OnInit {
             this._productoService.buscarCompras(Object.keys(queryParams).map(key => `${key}=${queryParams[key]}`).join('&'), idOrigen).subscribe(data => {
                 this.listCompras = data;
                 this.toastr.success('Búsqueda realizada', 'Correcto');
+
             }, error => {
                 console.log(JSON.stringify(error));
                 this.toastr.error((error as any).statusText, 'Error');
-                this.listCompras = [];
+                this.actualizar();
             });
             this.pidiendoID = false;
         });
@@ -192,19 +197,17 @@ export class ComprasComponent implements OnInit {
             try {
                 this._productoService.editarCompra(COMPRA._id, COMPRA, idOrigen).subscribe(data => {
                     this.toastr.success('Compra editada', 'Correcto');
-                    this.listCompras = [];
-                    this.editandoCompra = false;
-                    this.pidiendoID = false;
+                    this.actualizar();
+
                 }, error => {
                     console.log(JSON.stringify(error));
                     this.toastr.error((error as any).statusText, 'Error');
-                    this.editandoCompra = false;
+                    this.actualizar();
                 });
             } catch (error) {
                 this.toastr.error((error as any).statusText, 'Error');
-                this.editandoCompra = false;
+                this.actualizar();
             }
-            this.editandoCompra = false;
         });
     }
 
@@ -214,17 +217,16 @@ export class ComprasComponent implements OnInit {
             try {
                 this._productoService.eliminarCompra(id, idOrigen).subscribe(data => {
                     this.toastr.info('La compra fue eliminado con exito', 'COMPRA ELIMINADO!');
-                    this.listProductos = [];
-                    this.listCompras = [];
-                    this.pidiendoID = false;
+                    this.actualizar();
+
                 }, error => {
                     console.log(JSON.stringify(error));
                     this.toastr.error((error as any).statusText, 'Error');
-                    this.pidiendoID = false;
+                    this.actualizar();
                 });
             } catch (error) {
                 this.toastr.error((error as any).statusText, 'Error');
-                this.pidiendoID = false;
+                this.actualizar();
             }
         });
     }

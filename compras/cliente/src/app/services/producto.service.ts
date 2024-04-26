@@ -23,7 +23,7 @@ export class ProductoService {
         if (compra === '') {
             return this.http.get(this.url + "?idOrigen=" + idOrigen);
         }
-        return this.http.get(this.url + "&idOrigen=" + idOrigen);
+        return this.http.get(this.url + "?" + compra + "&idOrigen=" + idOrigen);
     }
 
     eliminarCompra(id: string, idOrigen: string): Observable<any> {

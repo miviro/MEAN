@@ -5,8 +5,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { ComprasComponent } from './components/compras/compras.component';
 
 const routes: Routes = [
-    { path: 'admin', component: ComprasComponent, pathMatch: 'full' },
-    { path: '**', redirectTo: 'admin', pathMatch: 'full' }
+    { path: 'compras', component: ComprasComponent, pathMatch: 'full' },
+    { path: '**', redirectTo: 'compras', pathMatch: 'full' }
 ];
 
 @NgModule({
