@@ -135,9 +135,13 @@ exports.eliminarCompra = async(req, res) => {
 
             // actualizar stock
             let unidadesCanceladas = compra.cantidad;
-            let stockDisponible = (await Producto.findById(compra.idArticulo)).stock;
+            let producto = await Producto.findById(compra.idArticulo);
+            if (!producto) {
+                return res.status(404).json({ msg: 'No existe el producto' });
+            }
+            let stockDisponible = producto.stock;
             stockDisponible += unidadesCanceladas;
-            Producto.findByIdAndUpdate(compra.idArticulo, { stock: stockDisponible });
+            await Producto.findByIdAndUpdate(compra.idArticulo, { stock: stockDisponible });
 
             await Compra.deleteOne({ _id: req.params.id });
             res.json({ msg: 'Compra eliminado' });

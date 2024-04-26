@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ProductoService } from '../../services/producto.service';
 import { Producto } from '../../models/producto';
+import { Compra } from '../../models/compra';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Router } from '@angular/router'; // Import ActivatedRoute
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -13,10 +14,14 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 export class ComprasComponent implements OnInit {
     pidiendoID: boolean = false;
+    editandoCompra: boolean = false;
     sesionForm: FormGroup;
     productoForm: FormGroup;
     compraForm: FormGroup;
+    editarCompraForm: FormGroup;
+    buscaCompraForm: FormGroup;
     listProductos: Producto[] = [];
+    listCompras: Compra[] = [];
     comprandoProducto: boolean = false;
 
     constructor(
@@ -40,6 +45,19 @@ export class ComprasComponent implements OnInit {
         this.compraForm = this.fb.group({
             idArticulo: ['', Validators.required],
             cantidad: ['', Validators.required],
+            nombreComprador: ['', Validators.required],
+            direccion: ['', Validators.required],
+        });
+        this.buscaCompraForm = this.fb.group({
+            _id: ['', Validators.required],
+            idCliente: ['', Validators.required],
+            idArticulo: ['', Validators.required],
+            cantidad: ['', Validators.required],
+            nombreComprador: ['', Validators.required],
+            direccion: ['', Validators.required],
+        });
+        this.editarCompraForm = this.fb.group({
+            _id: ['', Validators.required],
             nombreComprador: ['', Validators.required],
             direccion: ['', Validators.required],
         });
@@ -118,6 +136,95 @@ export class ComprasComponent implements OnInit {
             } catch (error) {
                 this.toastr.error((error as any).statusText, 'Error');
                 this.comprandoProducto = false;
+            }
+        });
+    }
+
+    buscarCompras() {
+        this.pedirID(() => {
+            const idOrigen = this.sesionForm.get('id')?.value;
+            let COMPRA: Compra = {
+                _id: this.buscaCompraForm.get('_id')?.value,
+                idCliente: this.buscaCompraForm.get('idCliente')?.value,
+                idArticulo: this.buscaCompraForm.get('idArticulo')?.value,
+                cantidad: this.buscaCompraForm.get('cantidad')?.value,
+                nombreComprador: this.buscaCompraForm.get('nombreComprador')?.value,
+                direccion: this.buscaCompraForm.get('direccion')?.value,
+            }
+            const queryParams: { [key: string]: string | number } = {
+                _id: COMPRA._id || '',
+                idCliente: COMPRA.idCliente,
+                idArticulo: COMPRA.idArticulo,
+                cantidad: COMPRA.cantidad,
+                nombreComprador: COMPRA.nombreComprador,
+                direccion: COMPRA.direccion,
+            };
+
+            // Filter out null or empty values from queryParams
+            Object.keys(queryParams).forEach(key => (queryParams[key] == null || queryParams[key] === '') && delete queryParams[key]);
+            this._productoService.buscarCompras(Object.keys(queryParams).map(key => `${key}=${queryParams[key]}`).join('&'), idOrigen).subscribe(data => {
+                this.listCompras = data;
+                this.toastr.success('Búsqueda realizada', 'Correcto');
+            }, error => {
+                console.log(JSON.stringify(error));
+                this.toastr.error((error as any).statusText, 'Error');
+                this.listCompras = [];
+            });
+            this.pidiendoID = false;
+        });
+    }
+
+    hacerEditarCompra(id: string) {
+        this.editandoCompra = true;
+
+        let data = this.listCompras.find(compra => compra._id === id);
+        this.editarCompraForm.setValue({
+            _id: data?._id,
+            nombreComprador: data?.nombreComprador,
+            direccion: data?.direccion,
+        });
+    }
+
+    editarCompra() {
+        this.pedirID(() => {
+            const idOrigen = this.sesionForm.get('id')?.value;
+            let COMPRA = this.editarCompraForm.value;
+            try {
+                this._productoService.editarCompra(COMPRA._id, COMPRA, idOrigen).subscribe(data => {
+                    this.toastr.success('Compra editada', 'Correcto');
+                    this.listCompras = [];
+                    this.editandoCompra = false;
+                    this.pidiendoID = false;
+                }, error => {
+                    console.log(JSON.stringify(error));
+                    this.toastr.error((error as any).statusText, 'Error');
+                    this.editandoCompra = false;
+                });
+            } catch (error) {
+                this.toastr.error((error as any).statusText, 'Error');
+                this.editandoCompra = false;
+            }
+            this.editandoCompra = false;
+        });
+    }
+
+    eliminarCompra(id: any) {
+        this.pedirID(() => {
+            const idOrigen = this.sesionForm.value.id;
+            try {
+                this._productoService.eliminarCompra(id, idOrigen).subscribe(data => {
+                    this.toastr.info('La compra fue eliminado con exito', 'COMPRA ELIMINADO!');
+                    this.listProductos = [];
+                    this.listCompras = [];
+                    this.pidiendoID = false;
+                }, error => {
+                    console.log(JSON.stringify(error));
+                    this.toastr.error((error as any).statusText, 'Error');
+                    this.pidiendoID = false;
+                });
+            } catch (error) {
+                this.toastr.error((error as any).statusText, 'Error');
+                this.pidiendoID = false;
             }
         });
     }
